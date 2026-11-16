@@ -1,56 +1,65 @@
-# Welcome to your Expo app 👋
+# Tikk ⏳
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Tikk is an iPhone app that asks you what you did every hour, then shows where your time really goes.
+A little sand spirit called Tikk reacts to your day: focused hours make it glow, and scrolling makes it melt.
 
-## Get started
+Built with [Expo](https://expo.dev) (React Native + TypeScript), so it can be built and published **without a Mac**.
 
-1. Install dependencies
+## What works now (v0.1)
 
-   ```bash
+- **Hourly check-ins**: repeating notifications during your waking hours. Long-press one and tap a category button to log it.
+- **Check-in screen**: pick a category for one or more hours, with an optional note.
+- **Today screen**: Tikk's mood, XP/level, streak, a "check in" button for the hours you haven't logged, and a timeline of your day.
+- **Insights**: focus score, biggest time sink, time per category, and a 7-day chart with your "danger hours".
+- **Game rules**: +10 XP per logged hour, +5 for logging on time, a streak for every day with 4+ hours logged, and Tikk grows a sprout at level 4 and a halo at level 8.
+- **Settings**: day start/end, check-in every 1h or 2h, test notification.
+- All data stays on the phone.
+
+## Where things live
+
+| Folder / file | What it is |
+|---|---|
+| `src/app/` | Screens. Every file is a screen (`(tabs)/index.tsx` = Today). |
+| `src/components/tikk.tsx` | The Tikk character and its moods |
+| `src/lib/stats.ts` | Game rules: XP, levels, streaks, mood |
+| `src/lib/notifications.ts` | Check-in notifications |
+| `src/lib/categories.ts` | The activity categories (names, emoji, colours) |
+| `src/constants/theme.ts` | Colours and spacing |
+
+## Running it from Windows (one-time setup)
+
+1. Install **Node.js LTS** from https://nodejs.org and **Git** from https://git-scm.com.
+2. Open **PowerShell** and run:
+   ```
+   git clone https://github.com/dhruvmanek/time-tracker-app.git
+   cd time-tracker-app
    npm install
    ```
 
-2. Start the app
+### Quick preview on your iPhone (Expo Go)
 
-   ```bash
-   npx expo start
-   ```
+1. Install **Expo Go** from the App Store on your iPhone.
+2. On your laptop run `npx expo start` and scan the QR code with the iPhone camera.
+   The phone and laptop must be on the same Wi-Fi. If it doesn't connect, run `npx expo start --tunnel`.
 
-In the output, you'll find options to open the app in a
+Notification buttons may not behave exactly as in the real app inside Expo Go. Use TestFlight (below) to test those.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Real app on your iPhone (TestFlight)
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Needs an Apple Developer account ($99/year, https://developer.apple.com/programs/).
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+npm install -g eas-cli
+eas login
+eas build --platform ios --profile production --auto-submit
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+EAS builds the app on Expo's Macs and uploads it to App Store Connect.
+When it finishes, install the **TestFlight** app on your iPhone and open Tikk from there.
 
-### Other setup steps
+## Roadmap
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [x] Week 1: check-ins, notifications, timeline, insights, XP/streaks, placeholder Tikk
+- [ ] Week 2: polish from real-life use, morning intentions (planned vs. actual)
+- [ ] Week 3: illustrated and animated Tikk (Rive), more evolutions and unlockables
+- [ ] Week 4: subscriptions (RevenueCat), paywall, analytics (PostHog), App Store listing
