@@ -4,7 +4,8 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Body, Button, Card, Heading, Small, Title } from '@/components/ui';
-import { C, R, S } from '@/constants/theme';
+import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
+import { C, F, R, S } from '@/constants/theme';
 import { requestPermission, rescheduleAll, sendTestNotification } from '@/lib/notifications';
 import { checkInHours } from '@/lib/stats';
 import { resetAll, updateSettings, useAppState } from '@/lib/store';
@@ -24,7 +25,10 @@ export default function SettingsScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: C.bg }}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + S.sm }]}>
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + S.sm, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + S.lg },
+      ]}>
       <Title>Settings</Title>
 
       <Card style={{ gap: S.md }}>
@@ -33,7 +37,7 @@ export default function SettingsScreen() {
           <Body>Reminders</Body>
           <Switch
             value={settings.notificationsOn}
-            trackColor={{ true: C.focus }}
+            trackColor={{ true: C.good }}
             onValueChange={async (on) => {
               if (on && !(await requestPermission()) && Platform.OS !== 'web') {
                 Alert.alert('Notifications are off', 'Turn on notifications for Tikk in the iPhone Settings app.');
@@ -74,7 +78,7 @@ export default function SettingsScreen() {
           Tikk will check in {count} times a day, from {formatHour(settings.dayStart + settings.interval)} to{' '}
           {formatHour(settings.dayEnd)}.
         </Small>
-        <Button label="Send a test notification" variant="secondary" onPress={sendTestNotification} />
+        <Button label="Send a test notification" variant="light" onPress={sendTestNotification} />
         <Small>Arrives in 5 seconds. Lock your phone, then long-press it to see the quick-log buttons.</Small>
       </Card>
 
@@ -132,12 +136,12 @@ function HourStepper({
 }
 
 const styles = StyleSheet.create({
-  content: { padding: S.md, gap: S.md, paddingBottom: 120 },
+  content: { padding: S.md, gap: S.md },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 3 },
   segItem: { paddingVertical: 6, paddingHorizontal: 16, borderRadius: R.pill },
-  segActive: { backgroundColor: C.card },
-  segText: { fontWeight: '700', color: C.ink },
+  segActive: { backgroundColor: C.sand },
+  segText: { fontFamily: F.bold, color: C.ink },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: S.sm },
   stepBtn: {
     width: 34,
@@ -147,6 +151,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepText: { fontSize: 20, fontWeight: '700', color: C.ink },
-  stepValue: { width: 76, textAlign: 'center', fontWeight: '700', color: C.ink },
+  stepText: { fontSize: 22, fontFamily: F.bold, color: C.ink, marginTop: -2 },
+  stepValue: { width: 80, textAlign: 'center', fontFamily: F.bold, color: C.ink },
 });

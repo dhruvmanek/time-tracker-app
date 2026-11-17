@@ -1,7 +1,15 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 
-import { C, R, S } from '@/constants/theme';
+import { C, F, R, S, sticker } from '@/constants/theme';
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return <View style={[styles.card, style]}>{children}</View>;
@@ -23,6 +31,7 @@ export function Small({ children, style }: { children: ReactNode; style?: StyleP
   return <Text style={[styles.small, style]}>{children}</Text>;
 }
 
+/** Chunky sticker-style button. */
 export function Button({
   label,
   onPress,
@@ -32,7 +41,7 @@ export function Button({
 }: {
   label: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'light' | 'ghost';
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
@@ -43,39 +52,54 @@ export function Button({
       style={({ pressed }) => [
         styles.button,
         variant === 'primary' && styles.buttonPrimary,
-        variant === 'secondary' && styles.buttonSecondary,
+        variant === 'light' && styles.buttonLight,
         variant === 'ghost' && styles.buttonGhost,
-        (pressed || disabled) && { opacity: disabled ? 0.4 : 0.85, transform: [{ scale: 0.98 }] },
+        pressed && variant !== 'ghost' && { transform: [{ translateY: 3 }], shadowOffset: { width: 0, height: 1 } },
+        disabled && { opacity: 0.4 },
         style,
       ]}>
-      <Text
-        style={[
-          styles.buttonText,
-          variant !== 'primary' && { color: C.ink },
-        ]}>
-        {label}
-      </Text>
+      <Text style={[styles.buttonText, variant !== 'primary' && { color: C.ink }]}>{label}</Text>
     </Pressable>
   );
 }
 
-export function Chip({ label, tone = 'default' }: { label: string; tone?: 'default' | 'fire' | 'level' }) {
+export function ProgressBar({ value, color = C.good, height = 18 }: { value: number; color?: string; height?: number }) {
   return (
-    <View
-      style={[
-        styles.chip,
-        tone === 'fire' && { backgroundColor: '#FFE3D6' },
-        tone === 'level' && { backgroundColor: '#FFF0C2' },
-      ]}>
-      <Text style={styles.chipText}>{label}</Text>
+    <View style={[styles.track, { height }]}>
+      <View
+        style={[
+          styles.fill,
+          { width: `${Math.max(0, Math.min(1, value)) * 100}%`, backgroundColor: color },
+        ]}
+      />
     </View>
   );
 }
 
-export function ProgressBar({ value, color = C.sand }: { value: number; color?: string }) {
+/** Big chunky number with a white outline, e.g. "82%". */
+export function BigNumber({ value, suffix, size = 96 }: { value: string; suffix?: string; size?: number }) {
+  const o = Math.max(3, Math.round(size / 18)); // outline thickness
+  const offsets: [number, number][] = [
+    [-o, 0], [o, 0], [0, -o], [0, o],
+    [-o * 0.7, -o * 0.7], [o * 0.7, -o * 0.7], [-o * 0.7, o * 0.7], [o * 0.7, o * 0.7],
+  ];
+  const content = (
+    <>
+      {value}
+      {suffix ? <Text style={{ fontSize: size * 0.42 }}>{suffix}</Text> : null}
+    </>
+  );
+  const base: TextStyle = { fontFamily: F.display, fontSize: size, lineHeight: size * 1.02, color: C.ink };
   return (
-    <View style={styles.track}>
-      <View style={[styles.fill, { width: `${Math.max(0, Math.min(1, value)) * 100}%`, backgroundColor: color }]} />
+    <View style={{ alignSelf: 'center' }}>
+      {/* drop shadow */}
+      <Text style={[base, styles.abs, { color: 'rgba(0,0,0,0.18)', transform: [{ translateY: o + 3 }] }]}>{content}</Text>
+      {offsets.map(([x, y], i) => (
+        <Text key={i} style={[base, styles.abs, { color: '#FFFFFF', transform: [{ translateX: x }, { translateY: y }] }]}>
+          {content}
+        </Text>
+      ))}
+      <Text style={base}>{content}</Text>
     </View>
   );
 }
@@ -85,34 +109,30 @@ const styles = StyleSheet.create({
     backgroundColor: C.card,
     borderRadius: R.lg,
     padding: S.md,
-    shadowColor: '#7A5A30',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    ...sticker,
   },
-  title: { fontSize: 30, fontWeight: '800', color: C.ink, letterSpacing: -0.5 },
-  heading: { fontSize: 18, fontWeight: '700', color: C.ink },
-  body: { fontSize: 16, color: C.ink, lineHeight: 22 },
-  small: { fontSize: 13, color: C.sub, lineHeight: 18 },
+  title: { fontFamily: F.display, fontSize: 34, color: C.ink, letterSpacing: 0.3 },
+  heading: { fontFamily: F.bold, fontSize: 19, color: C.ink },
+  body: { fontFamily: F.medium, fontSize: 16, color: C.ink, lineHeight: 22 },
+  small: { fontFamily: F.medium, fontSize: 13.5, color: C.sub, lineHeight: 19 },
   button: {
-    borderRadius: R.pill,
-    paddingVertical: 16,
+    borderRadius: R.md,
+    paddingVertical: 15,
     paddingHorizontal: S.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonPrimary: { backgroundColor: C.ink },
-  buttonSecondary: { backgroundColor: C.cardAlt },
+  buttonPrimary: { backgroundColor: C.ink, ...sticker, borderColor: C.ink, shadowColor: '#000' },
+  buttonLight: { backgroundColor: C.white, ...sticker },
   buttonGhost: { backgroundColor: 'transparent' },
-  buttonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
-  chip: {
-    backgroundColor: C.cardAlt,
+  buttonText: { fontFamily: F.display, color: '#FFFFFF', fontSize: 20, letterSpacing: 0.3 },
+  track: {
     borderRadius: R.pill,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    overflow: 'hidden',
   },
-  chipText: { fontSize: 14, fontWeight: '700', color: C.ink },
-  track: { height: 10, borderRadius: R.pill, backgroundColor: C.cardAlt, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: R.pill },
+  abs: { position: 'absolute', left: 0, top: 0 },
 });

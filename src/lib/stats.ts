@@ -96,22 +96,29 @@ export function streak(state: AppState, today = new Date()): number {
   return count;
 }
 
-export function moodFor(summary: DaySummary): Mood {
-  if (summary.logged === 0) return 'sleepy';
-  const r = summary.focusRatio;
-  if (r === null) return 'happy';
-  if (r >= 0.7) return 'radiant';
-  if (r >= 0.45) return 'happy';
-  if (r >= 0.25) return 'meh';
-  return 'melty';
+/**
+ * Tikk's energy for a day, 0–100. Starts at 80 each morning.
+ * Focus hours charge it (+6), drain hours run it down (−12), neutral hours do nothing.
+ * Energy is only about how the day went. XP (for logging honestly) is separate.
+ */
+export const ENERGY_START = 80;
+export function energyFor(summary: DaySummary): number {
+  const e = ENERGY_START + summary.focus * 6 - summary.drain * 12;
+  return Math.max(0, Math.min(100, e));
+}
+
+export function moodForEnergy(energy: number): Mood {
+  if (energy >= 85) return 'radiant';
+  if (energy >= 60) return 'happy';
+  if (energy >= 40) return 'meh';
+  return 'drained';
 }
 
 export const MOOD_LINES: Record<Mood, string> = {
-  sleepy: 'Tikk is waiting for your first check-in.',
-  melty: 'Tikk is melting a little. Lots of scrolling today.',
-  meh: 'Tikk is doing okay. A focused hour would perk it up.',
-  happy: 'Tikk is happy. Nice balance today!',
-  radiant: 'Tikk is glowing! What a focused day.',
+  radiant: 'Tikk is ringing with energy!',
+  happy: 'Tikk is ticking along nicely',
+  meh: 'Tikk is slowing down…',
+  drained: 'Tikk is running down…',
 };
 
 /** Hours on the clock when check-ins happen, e.g. [9, 10, ..., 23]. */
@@ -171,4 +178,10 @@ export function drainByHour(state: AppState, days: number, today = new Date()) {
     }
   }
   return result;
+}
+
+/** How many check-in slots of today have already passed (for "6/9 check-ins"). */
+export function hoursDueToday(settings: Settings, now = new Date()): number {
+  const end = Math.min(now.getHours(), settings.dayEnd);
+  return Math.max(0, end - settings.dayStart);
 }

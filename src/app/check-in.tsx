@@ -4,34 +4,41 @@ import { useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Small, Title } from '@/components/ui';
-import { C, R, S } from '@/constants/theme';
-import { CATEGORIES } from '@/lib/categories';
-import { celebrate } from '@/lib/celebrate';
-import { ON_TIME_BONUS, XP_PER_HOUR } from '@/lib/stats';
-import { clearHour, logHours, useAppState } from '@/lib/store';
+import { Small, Title } from '@/components/ui';
+import { C, F, R, S, sticker } from '@/constants/theme';
+import { CATEGORIES, DEFAULT_QUICK_IDS, getCategory } from '@/lib/categories';
+import { recordLog } from '@/lib/log';
+import { pendingRange, topCategoryIds } from '@/lib/stats';
+import { clearHour, getState, useAppState } from '@/lib/store';
 import { dateKey, formatHour, formatRange } from '@/lib/time';
+import type { Category } from '@/lib/types';
 
 export default function CheckInScreen() {
   const params = useLocalSearchParams<{ date?: string; start?: string; end?: string }>();
   const insets = useSafeAreaInsets();
   const state = useAppState();
-  const date = params.date ?? dateKey();
-  const end = Number(params.end ?? new Date().getHours());
-  const [start, setStart] = useState(Number(params.start ?? end - 1));
-  const existing = end - start === 1 ? state.logs[date]?.[start] : undefined;
-  const [selected, setSelected] = useState<string | null>(existing?.categoryId ?? null);
-  const [note, setNote] = useState(existing?.note ?? '');
-  const minStart = Math.max(state.settings.dayStart, end - 6);
 
-  const save = () => {
-    if (!selected) return;
-    logHours(date, start, end, selected, note);
+  // Default to the unlogged stretch before now, or the last hour.
+  const fallback = pendingRange(getState()) ?? { start: new Date().getHours() - 1, end: new Date().getHours() };
+  const date = params.date ?? dateKey();
+  const end = params.end ? Number(params.end) : fallback.end;
+  const [start, setStart] = useState(params.start ? Number(params.start) : fallback.start);
+  const [note, setNote] = useState('');
+  const [noteOpen, setNoteOpen] = useState(false);
+
+  const day = state.logs[date] ?? {};
+  const existing = end - start === 1 ? day[start] : undefined;
+  const previous = day[start - 1];
+  const minStart = Math.max(state.settings.dayStart, end - 6, 0);
+
+  const usualIds = topCategoryIds(state, DEFAULT_QUICK_IDS).slice(0, 3);
+  const usuals = usualIds.map(getCategory);
+  const others = CATEGORIES.filter((c) => !usualIds.includes(c.id));
+
+  const log = (categoryId: string) => {
     if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const hours = end - start;
-    const onTime = date === dateKey() && new Date().getHours() - end <= 1;
-    celebrate(`Logged ${hours}h · +${hours * (XP_PER_HOUR + (onTime ? ON_TIME_BONUS : 0))} XP`);
-    router.back();
+    const result = recordLog(date, start, end, categoryId, note);
+    router.replace({ pathname: '/reward', params: result });
   };
 
   return (
@@ -40,62 +47,104 @@ export default function CheckInScreen() {
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + S.lg }]}
       keyboardShouldPersistTaps="handled">
       <View style={styles.grabber} />
-      <Title style={{ fontSize: 26 }}>What did you do?</Title>
+      <Title style={{ fontSize: 30 }}>What did you do?</Title>
 
       <View style={styles.rangeRow}>
         <Stepper label="‹" disabled={start <= minStart} onPress={() => setStart(start - 1)} />
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.range}>{formatRange(start, end)}</Text>
-          <Small>{end - start === 1 ? '1 hour' : `${end - start} hours`}</Small>
+          <Small>{end - start === 1 ? '1 hour · tap once to log' : `${end - start} hours · tap once to log`}</Small>
         </View>
         <Stepper label="›" disabled={start >= end - 1} onPress={() => setStart(start + 1)} />
       </View>
 
+      <Text style={styles.section}>Your usuals</Text>
       <View style={styles.grid}>
-        {CATEGORIES.map((c) => {
-          const active = selected === c.id;
-          return (
-            <Pressable
-              key={c.id}
-              onPress={() => {
-                setSelected(c.id);
-                if (Platform.OS !== 'web') Haptics.selectionAsync();
-              }}
-              style={[styles.tile, active && { borderColor: c.color, backgroundColor: c.color + '22' }]}>
-              <Text style={styles.emoji}>{c.emoji}</Text>
-              <Text style={styles.tileText} numberOfLines={2}>
-                {c.name}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {usuals.map((c) => (
+          <Tile key={c.id} category={c} big selected={existing?.categoryId === c.id} onPress={() => log(c.id)} />
+        ))}
       </View>
 
-      <TextInput
-        value={note}
-        onChangeText={setNote}
-        placeholder="Add a note (optional), e.g. “YouTube rabbit hole”"
-        placeholderTextColor={C.sub}
-        style={styles.input}
-        returnKeyType="done"
-      />
+      <Text style={styles.section}>Everything else</Text>
+      <View style={styles.grid}>
+        {others.map((c) => (
+          <Tile key={c.id} category={c} selected={existing?.categoryId === c.id} onPress={() => log(c.id)} />
+        ))}
+      </View>
 
-      <Button label="Save" onPress={save} disabled={!selected} />
+      <View style={styles.extras}>
+        {previous && (
+          <Pressable style={styles.extra} onPress={() => log(previous.categoryId)}>
+            <Text style={styles.extraText} numberOfLines={1}>
+              ⏪ Same as before ({getCategory(previous.categoryId).emoji})
+            </Text>
+          </Pressable>
+        )}
+        <Pressable style={styles.extra} onPress={() => setNoteOpen((o) => !o)}>
+          <Text style={styles.extraText}>✏️ {noteOpen ? 'Hide note' : 'Add a note'}</Text>
+        </Pressable>
+      </View>
+
+      {noteOpen && (
+        <TextInput
+          autoFocus
+          value={note}
+          onChangeText={setNote}
+          placeholder="e.g. “YouTube rabbit hole”. Then tap an activity."
+          placeholderTextColor={C.sub}
+          style={styles.input}
+        />
+      )}
+
       {existing && (
-        <Button
-          label={`Clear ${formatHour(start)}`}
-          variant="ghost"
+        <Pressable
+          style={{ alignSelf: 'center', padding: S.sm }}
           onPress={() => {
             clearHour(date, start);
             router.back();
-          }}
-        />
+          }}>
+          <Text style={[styles.extraText, { color: C.drain }]}>Clear {formatHour(start)}</Text>
+        </Pressable>
       )}
-      <Small style={{ textAlign: 'center' }}>
-        Honest logs earn the same XP as productive ones. Tikk only wants the truth.
-      </Small>
+      <Small style={{ textAlign: 'center' }}>Every honest check-in earns XP, even the scrolling ones.</Small>
     </ScrollView>
   );
+}
+
+function Tile({
+  category: c,
+  onPress,
+  big,
+  selected,
+}: {
+  category: Category;
+  onPress: () => void;
+  big?: boolean;
+  selected?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.tile,
+        { backgroundColor: tint(c.color) },
+        big && { paddingVertical: 16 },
+        selected && { borderColor: c.color, borderWidth: 4 },
+        pressed && { transform: [{ translateY: 3 }], shadowOffset: { width: 0, height: 1 } },
+      ]}>
+      <Text style={{ fontSize: big ? 32 : 26 }}>{c.emoji}</Text>
+      <Text style={styles.tileText} numberOfLines={2}>
+        {c.name}
+      </Text>
+    </Pressable>
+  );
+}
+
+/** A light pastel version of a category colour. */
+function tint(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  const mix = (v: number) => Math.round(v + (255 - v) * 0.72);
+  return `rgb(${mix((n >> 16) & 255)}, ${mix((n >> 8) & 255)}, ${mix(n & 255)})`;
 }
 
 function Stepper({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
@@ -107,8 +156,8 @@ function Stepper({ label, onPress, disabled }: { label: string; onPress: () => v
 }
 
 const styles = StyleSheet.create({
-  content: { padding: S.md, gap: S.md - 4 },
-  grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: C.faint, marginBottom: S.sm },
+  content: { padding: S.md, gap: S.sm + 2 },
+  grabber: { alignSelf: 'center', width: 44, height: 5, borderRadius: 3, backgroundColor: C.faint, marginBottom: S.xs },
   rangeRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -116,38 +165,58 @@ const styles = StyleSheet.create({
     backgroundColor: C.card,
     borderRadius: R.lg,
     padding: S.sm,
+    ...sticker,
   },
-  range: { fontSize: 22, fontWeight: '800', color: C.ink },
+  range: { fontFamily: F.display, fontSize: 24, color: C.ink },
   stepper: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: C.cardAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepperText: { fontSize: 24, fontWeight: '700', color: C.ink },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: S.sm },
+  stepperText: { fontFamily: F.bold, fontSize: 26, color: C.ink, marginTop: -3 },
+  section: {
+    fontFamily: F.bold,
+    fontSize: 13,
+    color: C.sub,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: S.xs,
+  },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
   tile: {
-    width: '31.5%',
-    aspectRatio: 1.45,
+    width: '31.6%',
     borderRadius: R.md,
-    backgroundColor: C.card,
-    borderWidth: 2,
-    borderColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: S.xs,
-    gap: 4,
+    paddingVertical: 11,
+    paddingHorizontal: 4,
+    gap: 2,
+    ...sticker,
   },
-  emoji: { fontSize: 24 },
-  tileText: { fontSize: 12, fontWeight: '600', color: C.ink, textAlign: 'center' },
+  tileText: { fontFamily: F.semibold, fontSize: 13, color: C.ink, textAlign: 'center' },
+  extras: { flexDirection: 'row', gap: S.sm, marginTop: S.xs },
+  extra: {
+    flex: 1,
+    backgroundColor: C.card,
+    borderRadius: R.md,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: C.faint,
+  },
+  extraText: { fontFamily: F.semibold, fontSize: 14, color: C.ink },
   input: {
     backgroundColor: C.card,
     borderRadius: R.md,
     paddingHorizontal: S.md,
-    paddingVertical: 14,
+    paddingVertical: 13,
     fontSize: 16,
+    fontFamily: F.medium,
     color: C.ink,
+    borderWidth: 2,
+    borderColor: C.ink,
   },
 });

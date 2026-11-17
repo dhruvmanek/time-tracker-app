@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { C, R, S } from '@/constants/theme';
+import { C, F, R, S } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
 import { formatHour } from '@/lib/time';
 import type { DayLog } from '@/lib/types';
@@ -55,18 +55,18 @@ export function Timeline({ day, dayStart, dayEnd, currentHour, onPressHour }: Pr
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: S.sm },
-  hour: { width: 52, fontSize: 12, fontWeight: '600', color: C.sub, textAlign: 'right' },
+  hour: { width: 52, fontSize: 12.5, fontFamily: F.semibold, color: C.sub, textAlign: 'right' },
   block: {
     flex: 1,
-    minHeight: 36,
+    minHeight: 38,
     borderRadius: R.sm,
-    borderLeftWidth: 4,
+    borderLeftWidth: 5,
     paddingHorizontal: S.sm,
     justifyContent: 'center',
   },
-  blockText: { fontSize: 14, fontWeight: '600', color: C.ink },
-  note: { fontWeight: '400', color: C.sub },
+  blockText: { fontSize: 14.5, fontFamily: F.semibold, color: C.ink },
+  note: { fontFamily: F.regular, color: C.sub },
   empty: { borderColor: C.faint, borderStyle: 'dashed', borderWidth: 1.5, borderLeftWidth: 1.5 },
-  emptyText: { fontSize: 13, color: C.sub },
+  emptyText: { fontSize: 13, fontFamily: F.medium, color: C.sub },
   future: { backgroundColor: C.cardAlt, borderColor: 'transparent', opacity: 0.5 },
 });

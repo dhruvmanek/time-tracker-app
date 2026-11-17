@@ -1,17 +1,20 @@
 # Tikk ⏳
 
 Tikk is an iPhone app that asks you what you did every hour, then shows where your time really goes.
-A little sand spirit called Tikk reacts to your day: focused hours make it glow, and scrolling makes it melt.
+Tikk is a little alarm-clock critter living in its own world. Focused hours keep it charged and the
+meadow sunny. Hours lost to scrolling drain its energy and turn the world dusky and wilted.
 
 Built with [Expo](https://expo.dev) (React Native + TypeScript), so it can be built and published **without a Mac**.
 
-## What works now (v0.1)
+## What works now (v0.2)
 
 - **Hourly check-ins**: repeating notifications during your waking hours. Long-press one and tap a category button to log it.
 - **Check-in screen**: pick a category for one or more hours, with an optional note.
-- **Today screen**: Tikk's mood, XP/level, streak, a "check in" button for the hours you haven't logged, and a timeline of your day.
+- **Home**: Tikk in its world, a big energy %, today's focus/drain stats, level and streak, and a button for hours you haven't logged.
+- **One-tap check-in**: your usual activities on top. Tapping one logs it instantly and shows a "+XP" reward screen.
+- **Day**: the full hour-by-hour timeline, with arrows to look back at past days.
 - **Insights**: focus score, biggest time sink, time per category, and a 7-day chart with your "danger hours".
-- **Game rules**: +10 XP per logged hour, +5 for logging on time, a streak for every day with 4+ hours logged, and Tikk grows a sprout at level 4 and a halo at level 8.
+- **Game rules**: +10 XP per logged hour, +5 for logging on time, a streak for every day with 4+ hours logged. Energy starts at 80% each day: +6 per focus hour, −12 per drain hour. Tikk earns a star badge at level 4 and a crown at level 8.
 - **Settings**: day start/end, check-in every 1h or 2h, test notification.
 - All data stays on the phone.
 
@@ -21,10 +24,12 @@ Built with [Expo](https://expo.dev) (React Native + TypeScript), so it can be bu
 |---|---|
 | `src/app/` | Screens. Every file is a screen (`(tabs)/index.tsx` = Today). |
 | `src/components/tikk.tsx` | The Tikk character and its moods |
+| `src/components/scene.tsx` | Tikk's world (changes with its mood) |
+| `src/components/tab-bar.tsx` | Bottom bar with the raised Log button |
 | `src/lib/stats.ts` | Game rules: XP, levels, streaks, mood |
 | `src/lib/notifications.ts` | Check-in notifications |
 | `src/lib/categories.ts` | The activity categories (names, emoji, colours) |
-| `src/constants/theme.ts` | Colours and spacing |
+| `src/constants/theme.ts` | Colours, fonts and the sticker style |
 
 ## Running it from Windows (one-time setup)
 
@@ -60,6 +65,7 @@ When it finishes, install the **TestFlight** app on your iPhone and open Tikk fr
 ## Roadmap
 
 - [x] Week 1: check-ins, notifications, timeline, insights, XP/streaks, placeholder Tikk
-- [ ] Week 2: polish from real-life use, morning intentions (planned vs. actual)
+- [x] Week 2: Brain Rot-inspired redesign: alarm-clock Tikk, living world, one-tap check-in, reward screen
+- [ ] Next: polish from real-life use, morning intentions (planned vs. actual), unlockable worlds
 - [ ] Week 3: illustrated and animated Tikk (Rive), more evolutions and unlockables
 - [ ] Week 4: subscriptions (RevenueCat), paywall, analytics (PostHog), App Store listing

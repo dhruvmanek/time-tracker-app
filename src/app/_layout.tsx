@@ -1,48 +1,53 @@
-import { Stack, useRouter, useSegments } from 'expo-router';
+import {
+  Fredoka_400Regular,
+  Fredoka_500Medium,
+  Fredoka_600SemiBold,
+  Fredoka_700Bold,
+} from '@expo-google-fonts/fredoka';
+import { LilitaOne_400Regular } from '@expo-google-fonts/lilita-one';
+import { useFonts } from 'expo-font';
+import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 
-import { CelebrationToast } from '@/components/toast';
 import { C } from '@/constants/theme';
-import { getCategory } from '@/lib/categories';
-import { celebrate } from '@/lib/celebrate';
 import { listenForResponses, rescheduleAll } from '@/lib/notifications';
-import { ON_TIME_BONUS, XP_PER_HOUR } from '@/lib/stats';
 import { useAppState, useHydrated } from '@/lib/store';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const hydrated = useHydrated();
+  const [fontsLoaded, fontError] = useFonts({
+    LilitaOne_400Regular,
+    Fredoka_400Regular,
+    Fredoka_500Medium,
+    Fredoka_600SemiBold,
+    Fredoka_700Bold,
+  });
+  const ready = hydrated && (fontsLoaded || !!fontError);
   const { onboarded } = useAppState();
   const segments = useSegments();
-  const router = useRouter();
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!ready) return;
     SplashScreen.hideAsync();
     if (!onboarded && segments[0] !== 'onboarding') {
       router.replace('/onboarding');
     }
-  }, [hydrated, onboarded, segments, router]);
+  }, [ready, onboarded, segments]);
 
   // Refresh scheduled check-ins (and their quick buttons) each launch.
   useEffect(() => {
     if (hydrated && onboarded) rescheduleAll();
   }, [hydrated, onboarded]);
 
-  useEffect(
-    () =>
-      listenForResponses((categoryId, hours) => {
-        const c = getCategory(categoryId);
-        celebrate(`${c.emoji} Logged ${hours}h · +${hours * (XP_PER_HOUR + ON_TIME_BONUS)} XP`);
-      }),
-    [],
-  );
+  // Logging from a notification button opens the reward screen.
+  useEffect(() => listenForResponses((reward) => router.push({ pathname: '/reward', params: reward })), []);
 
-  if (!hydrated) return <View style={{ flex: 1, backgroundColor: C.bg }} />;
+  if (!ready) return <View style={{ flex: 1, backgroundColor: C.bg }} />;
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -50,9 +55,12 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name="reward"
+          options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }}
+        />
         <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
       </Stack>
-      <CelebrationToast />
     </View>
   );
 }

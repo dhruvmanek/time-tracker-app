@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CategoryBars } from '@/components/breakdown';
 import { Body, Card, Heading, Small, Title } from '@/components/ui';
-import { C, R, S } from '@/constants/theme';
+import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
+import { C, F, R, S } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
 import { drainByHour, summarize } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
@@ -26,8 +27,11 @@ export default function InsightsScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: C.bg }}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + S.sm }]}>
-      <Title>Insights</Title>
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + S.sm, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + S.lg },
+      ]}>
+      <Title>Stats</Title>
 
       <View style={styles.segment}>
         {(['today', 'week'] as Range[]).map((r) => (
@@ -58,7 +62,7 @@ export default function InsightsScreen() {
               <Text style={{ fontSize: 34 }}>{getCategory(sink.id).emoji}</Text>
               <View style={{ flex: 1 }}>
                 <Small>Biggest time sink</Small>
-                <Body style={{ fontWeight: '700' }}>
+                <Body style={{ fontFamily: F.bold }}>
                   {getCategory(sink.id).name}: {sink.hours}h
                 </Body>
                 <Small>
@@ -135,8 +139,8 @@ function DangerHours() {
       <Small>The hours where time slips away most often.</Small>
       {worst.map((h) => (
         <View key={h.hour} style={styles.dangerRow}>
-          <Body style={{ fontWeight: '700' }}>{formatRange(h.hour, h.hour + 1)}</Body>
-          <Body style={{ color: C.drain, fontWeight: '700' }}>{Math.round((h.drain / h.total) * 100)}% drain</Body>
+          <Body style={{ fontFamily: F.bold }}>{formatRange(h.hour, h.hour + 1)}</Body>
+          <Body style={{ color: C.drain, fontFamily: F.bold }}>{Math.round((h.drain / h.total) * 100)}% drain</Body>
         </View>
       ))}
     </Card>
@@ -153,18 +157,18 @@ function Legend({ color, label }: { color: string; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: S.md, gap: S.md, paddingBottom: 120 },
-  segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 4 },
+  content: { padding: S.md, gap: S.md },
+  segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 4, borderWidth: 2.5, borderColor: C.ink },
   segItem: { flex: 1, paddingVertical: 10, borderRadius: R.pill, alignItems: 'center' },
-  segActive: { backgroundColor: C.card },
-  segText: { fontWeight: '700', color: C.sub },
+  segActive: { backgroundColor: C.sand, borderWidth: 2.5, borderColor: C.ink },
+  segText: { fontFamily: F.bold, fontSize: 15, color: C.sub },
   statsRow: { flexDirection: 'row', gap: S.sm },
   stat: { flex: 1, alignItems: 'center', gap: 2, paddingHorizontal: S.sm },
-  statValue: { fontSize: 24, fontWeight: '800' },
+  statValue: { fontFamily: F.display, fontSize: 28 },
   sink: { flexDirection: 'row', alignItems: 'center', gap: S.md },
   chart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 145 },
   chartCol: { alignItems: 'center', gap: 6, flex: 1 },
-  chartBar: { width: 22, borderRadius: 6, overflow: 'hidden', minHeight: 2, backgroundColor: C.cardAlt },
+  chartBar: { width: 24, borderRadius: 7, overflow: 'hidden', minHeight: 4, backgroundColor: C.cardAlt, borderWidth: 2, borderColor: C.ink },
   legend: { flexDirection: 'row', gap: S.md, justifyContent: 'center' },
   dangerRow: { flexDirection: 'row', justifyContent: 'space-between' },
 });

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { C, R, S } from '@/constants/theme';
+import { C, F, R, S } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
 import type { DaySummary } from '@/lib/stats';
 
@@ -47,10 +47,10 @@ export function CategoryBars({ summary }: { summary: DaySummary }) {
 }
 
 const styles = StyleSheet.create({
-  stack: { flexDirection: 'row', height: 14, borderRadius: R.pill, overflow: 'hidden', gap: 2 },
+  stack: { flexDirection: 'row', height: 20, borderRadius: R.pill, overflow: 'hidden', gap: 2, borderWidth: 2.5, borderColor: C.ink },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  label: { fontSize: 14, fontWeight: '600', color: C.ink },
-  value: { fontSize: 13, color: C.sub, fontWeight: '600' },
-  track: { height: 10, borderRadius: R.pill, backgroundColor: C.cardAlt, overflow: 'hidden' },
+  label: { fontSize: 15, fontFamily: F.semibold, color: C.ink },
+  value: { fontSize: 13.5, color: C.sub, fontFamily: F.semibold },
+  track: { height: 12, borderRadius: R.pill, backgroundColor: C.cardAlt, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: R.pill },
 });

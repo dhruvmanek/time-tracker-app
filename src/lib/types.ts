@@ -39,4 +39,4 @@ export type AppState = {
   handledResponses: string[];
 };
 
-export type Mood = 'sleepy' | 'melty' | 'meh' | 'happy' | 'radiant';
+export type Mood = 'drained' | 'meh' | 'happy' | 'radiant';

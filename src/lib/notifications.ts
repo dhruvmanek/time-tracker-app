@@ -10,7 +10,8 @@ import { router } from 'expo-router';
 import { Platform } from 'react-native';
 
 import { DEFAULT_QUICK_IDS, getCategory } from './categories';
-import { getState, logHours, markResponseHandled, ready } from './store';
+import { recordLog, type RewardParams } from './log';
+import { getState, markResponseHandled, ready } from './store';
 import { checkInHours, topCategoryIds } from './stats';
 import { dateKey, formatHour } from './time';
 
@@ -56,7 +57,7 @@ async function registerActions() {
         identifier: ACTION_PREFIX + id,
         buttonTitle: `${c.emoji} ${c.name}`,
         // iOS only delivers button taps to a closed app if it opens the app.
-        // It opens for a split second and shows a "+XP" celebration.
+        // The app opens straight onto the "+XP" reward screen.
         options: { opensAppToForeground: true },
       };
     }),
@@ -121,7 +122,7 @@ export async function sendTestNotification() {
 /** Called when the user taps a notification or one of its buttons. */
 async function handleResponse(
   response: Notifications.NotificationResponse,
-  onQuickLog: (categoryId: string, hours: number) => void,
+  onQuickLog: (reward: RewardParams) => void,
 ) {
   await ready;
   const { notification, actionIdentifier } = response;
@@ -134,8 +135,7 @@ async function handleResponse(
 
   if (actionIdentifier.startsWith(ACTION_PREFIX)) {
     const categoryId = actionIdentifier.slice(ACTION_PREFIX.length);
-    logHours(date, data.start, data.end, categoryId);
-    onQuickLog(categoryId, data.end - data.start);
+    onQuickLog(recordLog(date, data.start, data.end, categoryId));
   } else {
     router.push({
       pathname: '/check-in',
@@ -145,7 +145,7 @@ async function handleResponse(
 }
 
 /** Start listening for notification taps. Returns a cleanup function. */
-export function listenForResponses(onQuickLog: (categoryId: string, hours: number) => void) {
+export function listenForResponses(onQuickLog: (reward: RewardParams) => void) {
   if (!supported) return () => {};
   // The tap that launched the app (if it was closed).
   const last = Notifications.getLastNotificationResponse();
