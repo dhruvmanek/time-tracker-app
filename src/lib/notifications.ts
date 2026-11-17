@@ -22,7 +22,7 @@ const supported = Platform.OS !== 'web';
 const PROMPTS = [
   'What did you do since {start}?',
   'Quick one: how was {start}–{end}?',
-  'Tikk wants to know: where did {start}–{end} go?',
+  'Tikko wants to know: where did {start}–{end} go?',
   'Check in! What filled {start}–{end}?',
 ];
 
@@ -90,7 +90,7 @@ async function doReschedule() {
       .replace('{end}', formatHour(hour));
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Tikk ⏳',
+        title: 'Tikko ⏳',
         body: `${body} Hold to log in one tap.`,
         categoryIdentifier: CATEGORY_ID,
         data: { start, end: hour },
@@ -110,7 +110,7 @@ export async function sendTestNotification() {
   const now = new Date().getHours();
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: 'Tikk ⏳ (test)',
+      title: 'Tikko ⏳ (test)',
       body: `What did you do since ${formatHour(Math.max(now - 1, 0))}? Hold to log in one tap.`,
       categoryIdentifier: CATEGORY_ID,
       data: { start: Math.max(now - 1, 0), end: Math.max(now, 1) },

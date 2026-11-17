@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Scene, SCENES } from '@/components/scene';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
-import { Tikk } from '@/components/tikk';
+import { Tikko } from '@/components/tikko';
 import { BigNumber, Button, ProgressBar } from '@/components/ui';
 import { C, F, R, S } from '@/constants/theme';
 import { onCelebrate } from '@/lib/celebrate';
@@ -54,14 +54,14 @@ export default function HomeScreen() {
           <View style={styles.badge}>
             <Text style={styles.badgeText}>⭐ {lvl.level}</Text>
           </View>
-          <Text style={styles.logo}>TIKK</Text>
+          <Text style={styles.logo}>TIKKO</Text>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>🔥 {days}</Text>
           </View>
         </View>
 
         <View style={styles.tikk}>
-          <Tikk mood={mood} stage={stageForLevel(lvl.level)} size={Math.min(210, width * 0.52)} bounceKey={bounce} />
+          <Tikko mood={mood} stage={stageForLevel(lvl.level)} size={Math.min(210, width * 0.52)} bounceKey={bounce} />
         </View>
 
         <BigNumber value={String(energy)} suffix="%" />
@@ -89,7 +89,7 @@ export default function HomeScreen() {
           />
         ) : (
           <View style={[styles.caughtUp, { backgroundColor: scene.panel }]}>
-            <Text style={styles.caughtUpText}>✨ All caught up. Tikk will ring at the next hour.</Text>
+            <Text style={styles.caughtUpText}>✨ All caught up. Tikko will ring at the next hour.</Text>
           </View>
         )}
 

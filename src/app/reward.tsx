@@ -3,9 +3,8 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-import { Tikk } from '@/components/tikk';
+import { Tikko } from '@/components/tikko';
 import { BigNumber, Button } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
@@ -14,6 +13,14 @@ import type { RewardParams } from '@/lib/log';
 import { STREAK_MIN_HOURS, streak } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
 import { dateKey } from '@/lib/time';
+
+const GLOW = [
+  { r: 1.15, color: '#FFC25E' },
+  { r: 0.9, color: '#FFCF7A' },
+  { r: 0.68, color: '#FFDC98' },
+  { r: 0.46, color: '#FFE8B6' },
+  { r: 0.26, color: '#FFF2D2' },
+];
 
 /** The little celebration after every check-in. */
 export default function RewardScreen() {
@@ -47,16 +54,23 @@ export default function RewardScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + S.xl, paddingBottom: insets.bottom + S.md }]}>
-      {/* Explicit pixel sizes: percentage sizes don't fill the screen on iOS. */}
-      <Svg style={StyleSheet.absoluteFill} width={width} height={height}>
-        <Defs>
-          <RadialGradient id="g" cx="50%" cy="38%" r="75%">
-            <Stop offset="0" stopColor="#FFF0C4" />
-            <Stop offset="1" stopColor="#FFB547" />
-          </RadialGradient>
-        </Defs>
-        <Rect x={0} y={0} width={width} height={height} fill="url(#g)" />
-      </Svg>
+      {/* Warm glow behind Tikko: plain circles (no SVG), so it always fills the screen. */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {GLOW.map(({ r, color }) => (
+          <View
+            key={r}
+            style={{
+              position: 'absolute',
+              width: width * r * 2,
+              height: width * r * 2,
+              borderRadius: width * r,
+              left: width / 2 - width * r,
+              top: height * 0.42 - width * r,
+              backgroundColor: color,
+            }}
+          />
+        ))}
+      </View>
 
       <Animated.View entering={ZoomIn.springify().damping(9)}>
         <BigNumber value={`+${p.xp ?? 0}`} suffix=" XP" size={76} />
@@ -69,7 +83,7 @@ export default function RewardScreen() {
       ) : null}
 
       <View style={{ alignItems: 'center' }}>
-        <Tikk mood="radiant" size={230} bounceKey={bounce} />
+        <Tikko mood="radiant" size={230} bounceKey={bounce} />
       </View>
 
       <Animated.View entering={FadeInDown.delay(150)} style={{ alignItems: 'center', gap: S.sm }}>
@@ -86,7 +100,7 @@ export default function RewardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFC46B', paddingHorizontal: S.lg, justifyContent: 'space-between', alignItems: 'center' },
+  container: { flex: 1, backgroundColor: '#FFB547', paddingHorizontal: S.lg, justifyContent: 'space-between', alignItems: 'center' },
   title: { fontFamily: F.display, fontSize: 32, color: C.ink, textAlign: 'center' },
   cat: { fontFamily: F.bold, fontSize: 18, color: C.ink },
   streak: { fontFamily: F.medium, fontSize: 16, color: '#6B4A2A', textAlign: 'center', paddingHorizontal: S.md },

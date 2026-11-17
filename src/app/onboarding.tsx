@@ -5,7 +5,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Scene } from '@/components/scene';
-import { Tikk } from '@/components/tikk';
+import { Tikko } from '@/components/tikko';
 import { Body, Button, Card, Small } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
 import { requestPermission, rescheduleAll } from '@/lib/notifications';
@@ -15,8 +15,8 @@ import type { Mood } from '@/lib/types';
 const STEPS: { mood: Mood; title: string; body: string }[] = [
   {
     mood: 'happy',
-    title: 'Meet Tikk',
-    body: 'Tikk is your little time buddy. It ticks along with your day and feels every hour you spend.',
+    title: 'Meet Tikko',
+    body: 'Tikko is your little time buddy. It ticks along with your day and feels every hour you spend.',
   },
   {
     mood: 'radiant',
@@ -26,12 +26,12 @@ const STEPS: { mood: Mood; title: string; body: string }[] = [
   {
     mood: 'drained',
     title: 'Scrolling runs it down',
-    body: 'Focused hours keep Tikk charged. Hours lost to scrolling drain it. Honest answers always earn XP.',
+    body: 'Focused hours keep Tikko charged. Hours lost to scrolling drain it. Honest answers always earn XP.',
   },
   {
     mood: 'radiant',
     title: 'Ready to start?',
-    body: 'Tikk will check in every hour from 9 AM to 11 PM. You can change this anytime in Settings.',
+    body: 'Tikko will check in every hour from 9 AM to 11 PM. You can change this anytime in Settings.',
   },
 ];
 
@@ -60,7 +60,7 @@ export default function Onboarding() {
         </View>
 
         <View style={{ alignItems: 'center', marginTop: S.xl }}>
-          <Tikk mood={current.mood} size={240} bounceKey={step} />
+          <Tikko mood={current.mood} size={240} bounceKey={step} />
         </View>
 
         <Animated.View key={step} entering={FadeIn.duration(250)} style={{ gap: S.md }}>
@@ -69,7 +69,7 @@ export default function Onboarding() {
             <Body style={{ textAlign: 'center' }}>{current.body}</Body>
             {last && (
               <Small style={{ textAlign: 'center' }}>
-                Next, iOS will ask to allow notifications. Tap “Allow”, or Tikk can’t ring.
+                Next, iOS will ask to allow notifications. Tap “Allow”, or Tikko can’t ring.
               </Small>
             )}
           </Card>

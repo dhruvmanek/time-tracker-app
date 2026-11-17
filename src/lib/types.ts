@@ -1,4 +1,4 @@
-/** How an activity affects Tikk. Focus feeds it, drain makes it melt, neutral does neither. */
+/** How an activity affects Tikko. Focus feeds it, drain makes it melt, neutral does neither. */
 export type CategoryKind = 'focus' | 'neutral' | 'drain';
 
 export type Category = {
@@ -21,7 +21,7 @@ export type HourLog = {
 export type DayLog = Record<number, HourLog>;
 
 export type Settings = {
-  /** First hour Tikk asks about (e.g. 8 = 8 AM). */
+  /** First hour Tikko asks about (e.g. 8 = 8 AM). */
   dayStart: number;
   /** Hour the day ends (e.g. 23 = last check-in at 11 PM, covering 10–11 PM). */
   dayEnd: number;

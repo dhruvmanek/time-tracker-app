@@ -40,7 +40,7 @@ export default function SettingsScreen() {
             trackColor={{ true: C.good }}
             onValueChange={async (on) => {
               if (on && !(await requestPermission()) && Platform.OS !== 'web') {
-                Alert.alert('Notifications are off', 'Turn on notifications for Tikk in the iPhone Settings app.');
+                Alert.alert('Notifications are off', 'Turn on notifications for Tikko in the iPhone Settings app.');
                 return;
               }
               updateSettings({ notificationsOn: on });
@@ -75,7 +75,7 @@ export default function SettingsScreen() {
           </View>
         </View>
         <Small>
-          Tikk will check in {count} times a day, from {formatHour(settings.dayStart + settings.interval)} to{' '}
+          Tikko will check in {count} times a day, from {formatHour(settings.dayStart + settings.interval)} to{' '}
           {formatHour(settings.dayEnd)}.
         </Small>
         <Button label="Send a test notification" variant="light" onPress={sendTestNotification} />
@@ -101,7 +101,7 @@ export default function SettingsScreen() {
         />
       </Card>
 
-      <Small style={{ textAlign: 'center' }}>Tikk v{Constants.expoConfig?.version ?? '1.0.0'}</Small>
+      <Small style={{ textAlign: 'center' }}>Tikko v{Constants.expoConfig?.version ?? '1.0.0'}</Small>
     </ScrollView>
   );
 }

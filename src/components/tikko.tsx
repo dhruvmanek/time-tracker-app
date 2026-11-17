@@ -1,4 +1,4 @@
-// Tikk: a little alarm-clock critter, drawn in a sticker style (thick outlines,
+// Tikko: a little alarm-clock critter, drawn in a sticker style (thick outlines,
 // flat colours). This is a code-drawn stand-in. Before launch, swap in
 // illustrated, animated art (e.g. made in Rive) with the same moods and stages.
 
@@ -21,7 +21,7 @@ type Props = {
   /** 1 = plain, 2 = gold star badge (level 4+), 3 = crown (level 8+). */
   stage?: 1 | 2 | 3;
   size?: number;
-  /** Increment to make Tikk jump and ring (e.g. after a check-in). */
+  /** Increment to make Tikko jump and ring (e.g. after a check-in). */
   bounceKey?: number;
 };
 
@@ -34,7 +34,7 @@ const LOOK: Record<Mood, { body: string; rim: string; face: string; bell: string
   drained: { body: '#A994B8', rim: '#8F7AA0', face: '#F1ECF4', bell: '#CDBB86', bellDark: '#B0A06C', bellAngle: 68, drop: 16 },
 };
 
-export function Tikk({ mood, stage = 1, size = 200, bounceKey = 0 }: Props) {
+export function Tikko({ mood, stage = 1, size = 200, bounceKey = 0 }: Props) {
   const look = LOOK[mood];
   const breathe = useSharedValue(0);
   const jump = useSharedValue(0);
@@ -69,13 +69,13 @@ export function Tikk({ mood, stage = 1, size = 200, bounceKey = 0 }: Props) {
     ],
   }));
 
-  const d = look.drop; // drained Tikk sags lower
+  const d = look.drop; // drained Tikko sags lower
   const cy = 118 + d;
   const eyeY = 112 + d;
 
   return (
     <View style={{ width: size, height: size * 1.1 }}>
-      {/* Ground shadow stays put while Tikk bounces */}
+      {/* Ground shadow stays put while Tikko bounces */}
       <Svg width="100%" height="100%" viewBox="0 0 200 220" style={{ position: 'absolute' }}>
         <Ellipse cx="100" cy="207" rx={58 + d / 2} ry="9" fill="#000" opacity={0.15} />
       </Svg>

@@ -1,6 +1,6 @@
 // The game rules and the numbers behind the Insights screen.
 // Design rule: XP comes from logging honestly, never from being "productive".
-// Productivity only changes Tikk's mood.
+// Productivity only changes Tikko's mood.
 
 import { CATEGORIES, getCategory } from './categories';
 import { addDays, dateKey } from './time';
@@ -76,7 +76,7 @@ export function levelInfo(xp: number) {
   return { level, xpIntoLevel: xp - floor, xpForLevel: next - floor };
 }
 
-/** Tikk grows as you level up: 1 = sprout, 2 = buddy, 3 = radiant elder. */
+/** Tikko grows as you level up: 1 = sprout, 2 = buddy, 3 = radiant elder. */
 export function stageForLevel(level: number): 1 | 2 | 3 {
   if (level >= 8) return 3;
   if (level >= 4) return 2;
@@ -97,7 +97,7 @@ export function streak(state: AppState, today = new Date()): number {
 }
 
 /**
- * Tikk's energy for a day, 0–100. Starts at 80 each morning.
+ * Tikko's energy for a day, 0–100. Starts at 80 each morning.
  * Focus hours charge it (+6), drain hours run it down (−12), neutral hours do nothing.
  * Energy is only about how the day went. XP (for logging honestly) is separate.
  */
@@ -115,10 +115,10 @@ export function moodForEnergy(energy: number): Mood {
 }
 
 export const MOOD_LINES: Record<Mood, string> = {
-  radiant: 'Tikk is ringing with energy!',
-  happy: 'Tikk is ticking along nicely',
-  meh: 'Tikk is slowing down…',
-  drained: 'Tikk is running down…',
+  radiant: 'Tikko is ringing with energy!',
+  happy: 'Tikko is ticking along nicely',
+  meh: 'Tikko is slowing down…',
+  drained: 'Tikko is running down…',
 };
 
 /** Hours on the clock when check-ins happen, e.g. [9, 10, ..., 23]. */

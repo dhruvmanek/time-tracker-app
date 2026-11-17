@@ -1,4 +1,4 @@
-// Tikk's world: a meadow whose colours follow Tikk's mood.
+// Tikko's world: a meadow whose colours follow Tikko's mood.
 // Sunny and green on a good day; dusky purple with wilted flowers on a scrolling day.
 
 import { StyleSheet, useWindowDimensions } from 'react-native';

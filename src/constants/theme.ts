@@ -1,4 +1,4 @@
-// Tikk's look: thick dark outlines, bold flat colours, chunky rounded type.
+// Tikko's look: thick dark outlines, bold flat colours, chunky rounded type.
 // Change values here to restyle the whole app.
 
 export const C = {

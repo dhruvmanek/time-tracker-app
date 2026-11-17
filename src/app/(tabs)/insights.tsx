@@ -47,7 +47,7 @@ export default function InsightsScreen() {
         <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: S.xl }}>
           <Text style={{ fontSize: 40 }}>⏳</Text>
           <Heading>No check-ins yet</Heading>
-          <Small style={{ textAlign: 'center' }}>Log a few hours and Tikk will show you where your time goes.</Small>
+          <Small style={{ textAlign: 'center' }}>Log a few hours and Tikko will show you where your time goes.</Small>
         </Card>
       ) : (
         <>
