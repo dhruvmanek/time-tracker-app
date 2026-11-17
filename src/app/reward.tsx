@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
@@ -20,6 +20,7 @@ export default function RewardScreen() {
   const p = useLocalSearchParams<RewardParams>();
   const state = useAppState();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const [bounce, setBounce] = useState(0);
 
   useEffect(() => {
@@ -46,14 +47,15 @@ export default function RewardScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + S.xl, paddingBottom: insets.bottom + S.md }]}>
-      <Svg style={StyleSheet.absoluteFill} width="100%" height="100%">
+      {/* Explicit pixel sizes: percentage sizes don't fill the screen on iOS. */}
+      <Svg style={StyleSheet.absoluteFill} width={width} height={height}>
         <Defs>
           <RadialGradient id="g" cx="50%" cy="38%" r="75%">
             <Stop offset="0" stopColor="#FFF0C4" />
             <Stop offset="1" stopColor="#FFB547" />
           </RadialGradient>
         </Defs>
-        <Rect width="100%" height="100%" fill="url(#g)" />
+        <Rect x={0} y={0} width={width} height={height} fill="url(#g)" />
       </Svg>
 
       <Animated.View entering={ZoomIn.springify().damping(9)}>
@@ -84,7 +86,7 @@ export default function RewardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: S.lg, justifyContent: 'space-between', alignItems: 'center' },
+  container: { flex: 1, backgroundColor: '#FFC46B', paddingHorizontal: S.lg, justifyContent: 'space-between', alignItems: 'center' },
   title: { fontFamily: F.display, fontSize: 32, color: C.ink, textAlign: 'center' },
   cat: { fontFamily: F.bold, fontSize: 18, color: C.ink },
   streak: { fontFamily: F.medium, fontSize: 16, color: '#6B4A2A', textAlign: 'center', paddingHorizontal: S.md },

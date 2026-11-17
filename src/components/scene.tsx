@@ -1,7 +1,7 @@
 // Tikk's world: a meadow whose colours follow Tikk's mood.
 // Sunny and green on a good day; dusky purple with wilted flowers on a scrolling day.
 
-import { StyleSheet } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, { Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import type { Mood } from '@/lib/types';
@@ -20,9 +20,10 @@ export const SCENES: Record<
 
 export function Scene({ mood }: { mood: Mood }) {
   const s = SCENES[mood];
+  const { width, height } = useWindowDimensions();
   const wilted = mood === 'drained' || mood === 'meh';
   return (
-    <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" viewBox="0 0 375 812" preserveAspectRatio="xMidYMid slice">
+    <Svg style={StyleSheet.absoluteFill} width={width} height={height} viewBox="0 0 375 812" preserveAspectRatio="xMidYMid slice">
       <Defs>
         <LinearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor={s.sky[0]} />
