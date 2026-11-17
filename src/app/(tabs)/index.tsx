@@ -1,20 +1,25 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Scene, SCENES } from '@/components/scene';
+import { Scene, SCENE_PANEL, timeOfDay } from '@/components/scene';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { Tikko } from '@/components/tikko';
 import { BigNumber, Button, ProgressBar } from '@/components/ui';
 import { C, F, R, S } from '@/constants/theme';
+import { CATEGORY_PROPS } from '@/lib/categories';
 import { onCelebrate } from '@/lib/celebrate';
 import {
+  activeWorld,
   energyFor,
   levelInfo,
   MOOD_LINES,
   moodForEnergy,
   pendingRange,
+  recentActivity,
   stageForLevel,
   streak,
   summarize,
@@ -32,18 +37,41 @@ export default function HomeScreen() {
   useEffect(() => onCelebrate(() => setBounce((n) => n + 1)), []);
 
   const today = dateKey(now);
+  const pending = pendingRange(state, now);
   const summary = summarize([state.logs[today]]);
   const energy = energyFor(summary);
   const mood = moodForEnergy(energy);
-  const scene = SCENES[mood];
+  const world = activeWorld(state);
+  const time = timeOfDay(now);
+  const night = time === 'night';
+  const recent = recentActivity(state, now);
+  const prop = recent ? CATEGORY_PROPS[recent] : undefined;
+  const [bubble, setBubble] = useState<string | null>(null);
+  const [cheer, setCheer] = useState(false);
+
+  // Tap Tikko: it jumps, rings and says something.
+  const poke = () => {
+    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setBounce((n) => n + 1);
+    const lines = pending ? PENDING_LINES : LINES[mood];
+    setBubble(lines[Math.floor(Math.random() * lines.length)]);
+    setCheer(true);
+  };
+  useEffect(() => {
+    if (!bubble) return;
+    const t = setTimeout(() => {
+      setBubble(null);
+      setCheer(false);
+    }, 2600);
+    return () => clearTimeout(t);
+  }, [bubble]);
   const lvl = levelInfo(totalXp(state));
   const days = streak(state, now);
-  const pending = pendingRange(state, now);
   const barColor = energy >= 60 ? C.good : energy >= 40 ? C.warn : C.drain;
 
   return (
     <View style={{ flex: 1 }}>
-      <Scene mood={mood} />
+      <Scene mood={mood} world={world} time={time} />
       <ScrollView
         contentContainerStyle={[
           styles.content,
@@ -54,15 +82,28 @@ export default function HomeScreen() {
           <View style={styles.badge}>
             <Text style={styles.badgeText}>⭐ {lvl.level}</Text>
           </View>
-          <Text style={styles.logo}>TIKKO</Text>
+          <Text style={[styles.logo, night && { color: '#FFFFFF' }]}>TIKKO</Text>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>🔥 {days}</Text>
           </View>
         </View>
 
-        <View style={styles.tikk}>
-          <Tikko mood={mood} stage={stageForLevel(lvl.level)} size={Math.min(210, width * 0.52)} bounceKey={bounce} />
-        </View>
+        <Pressable onPress={poke} style={styles.tikk} accessibilityRole="button" accessibilityLabel="Tap Tikko">
+          <Tikko
+            mood={mood}
+            pose={cheer && !prop ? 'cheer' : 'idle'}
+            prop={prop}
+            stage={stageForLevel(lvl.level)}
+            size={Math.min(210, width * 0.52)}
+            bounceKey={bounce}
+          />
+          {bubble && (
+            <Animated.View entering={FadeIn.duration(150)} exiting={FadeOut.duration(200)} style={styles.bubble}>
+              <Text style={styles.bubbleText}>{bubble}</Text>
+              <View style={styles.bubbleTail} />
+            </Animated.View>
+          )}
+        </Pressable>
 
         <BigNumber value={String(energy)} suffix="%" />
         <Text style={styles.moodLine}>{MOOD_LINES[mood]}</Text>
@@ -71,9 +112,9 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.stats}>
-          <Stat bg={scene.panel} icon="🎯" value={`${summary.focus}h`} label="Focus" />
-          <Stat bg={scene.panel} icon="🌀" value={`${summary.drain}h`} label="Drain" />
-          <Stat bg={scene.panel} icon="✅" value={`${summary.logged}h`} label="Logged" />
+          <Stat bg={SCENE_PANEL} icon="🎯" value={`${summary.focus}h`} label="Focus" />
+          <Stat bg={SCENE_PANEL} icon="🌀" value={`${summary.drain}h`} label="Drain" />
+          <Stat bg={SCENE_PANEL} icon="✅" value={`${summary.logged}h`} label="Logged" />
         </View>
 
         {pending ? (
@@ -88,12 +129,12 @@ export default function HomeScreen() {
             }
           />
         ) : (
-          <View style={[styles.caughtUp, { backgroundColor: scene.panel }]}>
+          <View style={[styles.caughtUp, { backgroundColor: SCENE_PANEL }]}>
             <Text style={styles.caughtUpText}>✨ All caught up. Tikko will ring at the next hour.</Text>
           </View>
         )}
 
-        <View style={[styles.xpRow, { backgroundColor: scene.panel }]}>
+        <View style={[styles.xpRow, { backgroundColor: SCENE_PANEL }]}>
           <Text style={styles.xpText}>Level {lvl.level}</Text>
           <View style={{ flex: 1 }}>
             <ProgressBar value={lvl.xpIntoLevel / lvl.xpForLevel} color={C.sand} height={14} />
@@ -106,6 +147,14 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+const LINES: Record<string, string[]> = {
+  radiant: ['Ding ding! We’re on fire 🔥', 'Best. Day. Ever.', 'Keep this up and I’ll get a crown 👑'],
+  happy: ['Tick tock, looking good!', 'Hehe, that tickles!', 'One hour at a time 💪'],
+  meh: ['I’m running a bit slow…', 'A focused hour would cheer me up', 'Wind me up a little?'],
+  drained: ['So… much… scrolling…', 'My battery is low 🪫', 'Help me recharge? One focused hour!'],
+};
+const PENDING_LINES = ['Psst! You haven’t logged your last hour', 'Ring ring! What did you just do?', 'Tell me about your last hour ⏰'];
 
 function Stat({ bg, icon, value, label }: { bg: string; icon: string; value: string; label: string }) {
   return (
@@ -141,6 +190,31 @@ const styles = StyleSheet.create({
   },
   badgeText: { fontFamily: F.display, fontSize: 18, color: C.ink },
   tikk: { alignItems: 'center', marginTop: S.sm },
+  bubble: {
+    position: 'absolute',
+    top: -6,
+    zIndex: 2,
+    maxWidth: 240,
+    backgroundColor: '#FFFFFF',
+    borderRadius: R.md,
+    borderWidth: 3,
+    borderColor: C.ink,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  bubbleText: { fontFamily: F.bold, fontSize: 14.5, color: C.ink, textAlign: 'center' },
+  bubbleTail: {
+    position: 'absolute',
+    bottom: -9,
+    alignSelf: 'center',
+    width: 14,
+    height: 14,
+    backgroundColor: '#FFFFFF',
+    borderRightWidth: 3,
+    borderBottomWidth: 3,
+    borderColor: C.ink,
+    transform: [{ rotate: '45deg' }],
+  },
   moodLine: {
     fontFamily: F.bold,
     fontSize: 17,

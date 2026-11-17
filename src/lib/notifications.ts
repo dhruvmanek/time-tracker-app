@@ -97,7 +97,8 @@ async function doReschedule() {
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour,
+        // A day that ends at midnight rings at hour 0 (iOS only accepts 0–23).
+        hour: hour % 24,
         minute: 0,
       },
     });
@@ -131,7 +132,10 @@ async function handleResponse(
 
   const data = notification.request.content.data as { start?: number; end?: number };
   if (typeof data?.start !== 'number' || typeof data?.end !== 'number') return;
-  const date = dateKey(new Date(notification.date));
+  // The midnight check-in arrives on the next calendar day but is about the day before.
+  const firedAt = new Date(notification.date);
+  if (firedAt.getHours() < data.start) firedAt.setDate(firedAt.getDate() - 1);
+  const date = dateKey(firedAt);
 
   if (actionIdentifier.startsWith(ACTION_PREFIX)) {
     const categoryId = actionIdentifier.slice(ACTION_PREFIX.length);

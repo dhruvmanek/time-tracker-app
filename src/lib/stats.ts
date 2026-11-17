@@ -4,6 +4,8 @@
 
 import { CATEGORIES, getCategory } from './categories';
 import { addDays, dateKey } from './time';
+import { WORLDS, type WorldId } from '@/components/scene';
+
 import type { AppState, DayLog, Mood, Settings } from './types';
 
 export const XP_PER_HOUR = 10;
@@ -186,4 +188,32 @@ export function drainByHour(state: AppState, days: number, today = new Date()) {
 export function hoursDueToday(settings: Settings, now = new Date()): number {
   const end = Math.min(now.getHours(), settings.dayEnd);
   return Math.max(0, end - settings.dayStart);
+}
+
+/** Days with at least STREAK_MIN_HOURS logged. Never goes down, so unlocks are kept. */
+export function goodDays(state: AppState): number {
+  return Object.values(state.logs).filter((day) => Object.keys(day).length >= STREAK_MIN_HOURS).length;
+}
+
+export function unlockedWorlds(state: AppState): WorldId[] {
+  const days = goodDays(state);
+  return WORLDS.filter((w) => days >= w.goodDays).map((w) => w.id);
+}
+
+/** The chosen world if it's unlocked, otherwise the newest unlocked one. */
+export function activeWorld(state: AppState): WorldId {
+  const unlocked = unlockedWorlds(state);
+  const chosen = state.settings.world;
+  return chosen && unlocked.includes(chosen) ? chosen : unlocked[unlocked.length - 1];
+}
+
+/** The most recent logged hour of today, if it was within the last 2 hours. */
+export function recentActivity(state: AppState, now = new Date()): string | undefined {
+  const day = state.logs[dateKey(now)];
+  if (!day) return undefined;
+  const h = now.getHours();
+  for (let hour = h - 1; hour >= h - 2; hour--) {
+    if (day[hour]) return day[hour].categoryId;
+  }
+  return undefined;
 }

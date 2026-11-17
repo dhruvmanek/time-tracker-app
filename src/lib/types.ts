@@ -1,3 +1,5 @@
+import type { WorldId } from '@/components/scene';
+
 /** How an activity affects Tikko. Focus feeds it, drain makes it melt, neutral does neither. */
 export type CategoryKind = 'focus' | 'neutral' | 'drain';
 
@@ -28,6 +30,8 @@ export type Settings = {
   /** Check-in every 1 or 2 hours. */
   interval: 1 | 2;
   notificationsOn: boolean;
+  /** The world shown behind Tikko (must be unlocked). Empty = newest unlocked. */
+  world?: WorldId;
 };
 
 /** Answers from the onboarding quiz. Used to personalise the app. */

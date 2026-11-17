@@ -19,7 +19,8 @@ export default function CheckInScreen() {
   const state = useAppState();
 
   // Default to the unlogged stretch before now, or the last hour.
-  const fallback = pendingRange(getState()) ?? { start: new Date().getHours() - 1, end: new Date().getHours() };
+  const h = new Date().getHours();
+  const fallback = pendingRange(getState()) ?? { start: Math.max(0, h - 1), end: Math.max(1, h) };
   const date = params.date ?? dateKey();
   const end = params.end ? Number(params.end) : fallback.end;
   const [start, setStart] = useState(params.start ? Number(params.start) : fallback.start);

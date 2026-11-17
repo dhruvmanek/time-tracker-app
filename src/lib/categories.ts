@@ -1,3 +1,4 @@
+import type { PropId } from '@/components/tikko';
 import { C } from '@/constants/theme';
 import type { Category } from './types';
 
@@ -31,3 +32,18 @@ export function getCategory(id: string): Category {
 
 /** Shown as buttons on the check-in notification until the user has some history. */
 export const DEFAULT_QUICK_IDS = ['work', 'learn', 'scroll', 'meals'];
+
+/** What Tikko holds while you're doing each activity. */
+export const CATEGORY_PROPS: Record<string, PropId> = {
+  work: 'laptop',
+  learn: 'book',
+  exercise: 'dumbbell',
+  chores: 'basket',
+  social: 'heart',
+  meals: 'mug',
+  commute: 'wheel',
+  meetings: 'clipboard',
+  scroll: 'phone',
+  tv: 'gamepad',
+  procrastinate: 'swirl',
+};

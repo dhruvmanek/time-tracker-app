@@ -19,6 +19,7 @@ import {
 } from '@/components/onboarding-kit';
 import { Scene } from '@/components/scene';
 import { Tikko } from '@/components/tikko';
+import { Typewriter } from '@/components/typewriter';
 import { BigNumber, Button, Card } from '@/components/ui';
 import { C, F, R, S } from '@/constants/theme';
 import { requestPermission, rescheduleAll } from '@/lib/notifications';
@@ -152,10 +153,15 @@ export default function Onboarding() {
     case 'welcome':
       body = (
         <View style={styles.center}>
-          <Tikko mood="happy" size={230} bounceKey={1} />
+          <Tikko mood="happy" pose="wave" size={230} bounceKey={1} />
           <Card style={styles.welcomeCard}>
-            <Text style={styles.bigTitle}>Hi, I’m Tikko!</Text>
-            <Text style={styles.lead}>I’m a little alarm clock who helps you find out where your time really goes.</Text>
+            <Typewriter text="Hi, I’m Tikko!" style={styles.bigTitle} delay={300} />
+            <Typewriter
+              text="I’m a little alarm clock who helps you find out where your time really goes."
+              style={styles.lead}
+              delay={800}
+              speed={20}
+            />
           </Card>
         </View>
       );
@@ -210,13 +216,18 @@ export default function Onboarding() {
     case 'shock':
       body = (
         <View style={styles.center}>
-          <Tikko mood="drained" size={170} />
+          <Tikko mood="drained" prop="phone" size={170} />
           <Animated.View entering={FadeInDown.delay(150)} style={styles.shockCard}>
-            <Text style={styles.shockSmall}>At {hours} hours a day, by age 80 you’ll lose</Text>
+            <Typewriter text={`At ${hours} hours a day, by age 80 you’ll lose`} style={styles.shockSmall} />
             <Animated.View entering={ZoomIn.delay(500).springify().damping(10)}>
               <BigNumber value={fmtYears(lostYears)} suffix=" years" size={80} />
             </Animated.View>
-            <Text style={styles.shockSmall}>That’s {fmtYears(lostYears)} full years of your life, gone without noticing.</Text>
+            <Typewriter
+              text={`That’s ${fmtYears(lostYears)} full years of your life, gone without noticing.`}
+              style={styles.shockSmall}
+              delay={1500}
+              speed={22}
+            />
           </Animated.View>
         </View>
       );
@@ -277,8 +288,16 @@ export default function Onboarding() {
     case 'wind':
       body = (
         <View style={styles.center}>
-          <Text style={[styles.bigTitle, { textAlign: 'center' }]}>Ready to take back your time?</Text>
-          <Text style={[styles.lead, { marginBottom: S.md }]}>Hold Tikko to wind it up and make it official.</Text>
+          <Card style={styles.welcomeCard}>
+            <Typewriter text="Ready to take back your time?" style={[styles.bigTitle, { fontSize: 28, textAlign: 'center' }]} />
+            <Typewriter
+              text="Hold Tikko to wind it up and make it official."
+              style={styles.lead}
+              delay={800}
+              speed={20}
+              haptics={false}
+            />
+          </Card>
           <HoldToWind onDone={() => setWound(true)} />
         </View>
       );
@@ -287,12 +306,15 @@ export default function Onboarding() {
     case 'notify':
       body = (
         <View style={styles.center}>
-          <Tikko mood="radiant" size={200} bounceKey={1} />
+          <Tikko mood="radiant" pose="cheer" size={200} bounceKey={1} />
           <Card style={styles.welcomeCard}>
-            <Text style={[styles.bigTitle, { fontSize: 30 }]}>Let Tikko ring</Text>
-            <Text style={styles.lead}>
-              Tikko needs notifications to check in with you. Without them, it can’t do its job.
-            </Text>
+            <Typewriter text="Let Tikko ring" style={[styles.bigTitle, { fontSize: 30 }]} />
+            <Typewriter
+              text="Tikko needs notifications to check in with you. Without them, it can’t do its job."
+              style={styles.lead}
+              delay={450}
+              speed={20}
+            />
           </Card>
         </View>
       );
@@ -328,13 +350,17 @@ export default function Onboarding() {
 }
 
 function Question({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+  const [typed, setTyped] = useState(false);
+  const titleMs = title.length * 26;
   return (
     <View style={{ gap: S.md }}>
       <View style={{ gap: 6 }}>
-        <Text style={styles.qTitle}>{title}</Text>
-        {subtitle ? <Text style={styles.qSub}>{subtitle}</Text> : null}
+        <Typewriter text={title} style={styles.qTitle} onDone={subtitle ? undefined : () => setTyped(true)} />
+        {subtitle ? (
+          <Typewriter text={subtitle} style={styles.qSub} speed={16} delay={titleMs} haptics={false} onDone={() => setTyped(true)} />
+        ) : null}
       </View>
-      {children}
+      {typed && <Animated.View entering={FadeInDown.duration(300)}>{children}</Animated.View>}
     </View>
   );
 }
@@ -372,7 +398,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: S.md + 4 },
   center: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', gap: S.md },
   welcomeCard: { alignSelf: 'stretch', alignItems: 'center', gap: S.sm, paddingVertical: S.lg },
-  bigTitle: { fontFamily: F.display, fontSize: 34, color: C.ink },
+  bigTitle: { fontFamily: F.display, fontSize: 34, color: C.ink, textAlign: 'center' },
   lead: { fontFamily: F.medium, fontSize: 16.5, color: C.ink, textAlign: 'center', lineHeight: 23 },
   qTitle: { fontFamily: F.display, fontSize: 30, color: C.ink, lineHeight: 34 },
   qSub: { fontFamily: F.medium, fontSize: 15.5, color: C.sub },

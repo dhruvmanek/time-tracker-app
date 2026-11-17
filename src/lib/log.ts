@@ -1,7 +1,9 @@
 // Logging an hour and working out the reward, shared by the check-in screen
 // and the notification buttons.
 
-import { levelInfo, totalXp } from './stats';
+import { WORLDS } from '@/components/scene';
+
+import { levelInfo, totalXp, unlockedWorlds } from './stats';
 import { getState, logHours } from './store';
 
 /** Params for the reward screen (strings, because they travel in the URL). */
@@ -10,6 +12,8 @@ export type RewardParams = {
   hours: string;
   xp: string;
   levelUp: string;
+  /** Id of a world unlocked by this check-in, if any. */
+  newWorld: string;
   date: string;
 };
 
@@ -22,6 +26,7 @@ export function recordLog(
 ): RewardParams {
   const before = getState();
   const xpBefore = totalXp(before);
+  const worldsBefore = unlockedWorlds(before);
   logHours(date, start, end, categoryId, note);
   const after = getState();
   const xpAfter = totalXp(after);
@@ -32,6 +37,7 @@ export function recordLog(
     hours: String(end - start),
     xp: String(Math.max(0, xpAfter - xpBefore)),
     levelUp: levelAfter > levelBefore ? String(levelAfter) : '',
+    newWorld: WORLDS.find((w) => unlockedWorlds(after).includes(w.id) && !worldsBefore.includes(w.id))?.id ?? '',
     date,
   };
 }

@@ -7,7 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tikko } from '@/components/tikko';
 import { BigNumber, Button } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
-import { getCategory } from '@/lib/categories';
+import { WORLDS } from '@/components/scene';
+import { CATEGORY_PROPS, getCategory } from '@/lib/categories';
 import { celebrate } from '@/lib/celebrate';
 import type { RewardParams } from '@/lib/log';
 import { STREAK_MIN_HOURS, streak } from '@/lib/stats';
@@ -76,6 +77,14 @@ export default function RewardScreen() {
         <BigNumber value={`+${p.xp ?? 0}`} suffix=" XP" size={76} />
       </Animated.View>
 
+      {p.newWorld ? (
+        <Animated.View entering={FadeInDown.delay(450)} style={styles.levelUp}>
+          <Text style={styles.levelUpText}>
+            {WORLDS.find((w) => w.id === p.newWorld)?.emoji} New world unlocked: {WORLDS.find((w) => w.id === p.newWorld)?.name}!
+          </Text>
+        </Animated.View>
+      ) : null}
+
       {p.levelUp ? (
         <Animated.View entering={FadeInDown.delay(300)} style={styles.levelUp}>
           <Text style={styles.levelUpText}>⭐ Level up! You’re now level {p.levelUp}</Text>
@@ -83,7 +92,7 @@ export default function RewardScreen() {
       ) : null}
 
       <View style={{ alignItems: 'center' }}>
-        <Tikko mood="radiant" size={230} bounceKey={bounce} />
+        <Tikko mood="radiant" prop={CATEGORY_PROPS[cat.id]} size={230} bounceKey={bounce} />
       </View>
 
       <Animated.View entering={FadeInDown.delay(150)} style={{ alignItems: 'center', gap: S.sm }}>
