@@ -30,8 +30,22 @@ export type Settings = {
   notificationsOn: boolean;
 };
 
+/** Answers from the onboarding quiz. Used to personalise the app. */
+export type Profile = {
+  goal?: string;
+  /** Category ids of the user's biggest time sinks (e.g. 'scroll', 'tv'). */
+  sinks?: string[];
+  persona?: string;
+  ageGroup?: string;
+  /** Self-estimated hours lost per day. */
+  hoursLost?: number;
+  /** What they'd do with time won back (e.g. 'Learning'). */
+  dream?: string;
+};
+
 export type AppState = {
   onboarded: boolean;
+  profile: Profile;
   settings: Settings;
   /** Logs keyed by local date "YYYY-MM-DD". */
   logs: Record<string, DayLog>;

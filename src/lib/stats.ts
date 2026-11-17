@@ -160,7 +160,9 @@ export function topCategoryIds(state: AppState, fallback: string[], today = new 
   }
   const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id);
   const valid = new Set(CATEGORIES.map((c) => c.id));
-  const result = [...ranked, ...fallback].filter((id, i, arr) => valid.has(id) && arr.indexOf(id) === i);
+  // Before there's history, put the user's biggest time sink (from onboarding) near the top.
+  const sink = state.profile?.sinks?.[0];
+  const result = [...ranked, ...(sink ? [fallback[0], sink] : []), ...fallback].filter((id, i, arr) => valid.has(id) && arr.indexOf(id) === i);
   return result.slice(0, 4);
 }
 

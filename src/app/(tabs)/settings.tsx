@@ -8,7 +8,7 @@ import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { C, F, R, S } from '@/constants/theme';
 import { requestPermission, rescheduleAll, sendTestNotification } from '@/lib/notifications';
 import { checkInHours } from '@/lib/stats';
-import { resetAll, updateSettings, useAppState } from '@/lib/store';
+import { replayOnboarding, resetAll, updateSettings, useAppState } from '@/lib/store';
 import { formatHour } from '@/lib/time';
 
 export default function SettingsScreen() {
@@ -84,6 +84,7 @@ export default function SettingsScreen() {
 
       <Card style={{ gap: S.sm }}>
         <Heading>Data</Heading>
+        <Button label="Replay the intro" variant="light" onPress={replayOnboarding} />
         <Small>Everything is stored only on this iPhone.</Small>
         <Button
           label="Erase all data"

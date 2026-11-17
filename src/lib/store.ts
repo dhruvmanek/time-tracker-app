@@ -4,7 +4,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
-import type { AppState, HourLog, Settings } from './types';
+import type { AppState, HourLog, Profile, Settings } from './types';
 
 const STORAGE_KEY = 'tikk-state-v1';
 
@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const initialState: AppState = {
   onboarded: false,
+  profile: {},
   settings: DEFAULT_SETTINGS,
   logs: {},
   handledResponses: [],
@@ -39,6 +40,7 @@ async function hydrate() {
         ...initialState,
         ...saved,
         settings: { ...DEFAULT_SETTINGS, ...saved.settings },
+        profile: { ...saved.profile },
       };
     }
   } catch (e) {
@@ -122,6 +124,15 @@ export function clearHour(date: string, hour: number) {
 
 export function updateSettings(patch: Partial<Settings>) {
   setState((s) => ({ ...s, settings: { ...s.settings, ...patch } }));
+}
+
+export function updateProfile(patch: Partial<Profile>) {
+  setState((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
+}
+
+/** Show the intro again (keeps all logs). */
+export function replayOnboarding() {
+  setState((s) => ({ ...s, onboarded: false }));
 }
 
 export function completeOnboarding() {
