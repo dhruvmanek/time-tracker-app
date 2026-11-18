@@ -17,6 +17,7 @@ import { dateKey, formatHour } from './time';
 
 const CATEGORY_ID = 'checkin';
 const ACTION_PREFIX = 'log:';
+const OTHER_ACTION = 'other';
 const supported = Platform.OS !== 'web';
 
 const PROMPTS = [
@@ -46,12 +47,14 @@ export async function requestPermission(): Promise<boolean> {
   return asked.granted;
 }
 
-/** Notification buttons = your 4 most-used categories. Refreshed each app launch. */
+/**
+ * Notification buttons: your 3 most-used activities, plus "Something else",
+ * which opens the full check-in screen. Refreshed each app launch.
+ */
 async function registerActions() {
-  const ids = topCategoryIds(getState(), DEFAULT_QUICK_IDS);
-  await Notifications.setNotificationCategoryAsync(
-    CATEGORY_ID,
-    ids.map((id) => {
+  const ids = topCategoryIds(getState(), DEFAULT_QUICK_IDS).slice(0, 3);
+  await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
+    ...ids.map((id) => {
       const c = getCategory(id);
       return {
         identifier: ACTION_PREFIX + id,
@@ -61,7 +64,13 @@ async function registerActions() {
         options: { opensAppToForeground: true },
       };
     }),
-  );
+    { identifier: OTHER_ACTION, buttonTitle: '✏️ Something else…', options: { opensAppToForeground: true } },
+  ]);
+}
+
+/** iOS reports a notification's time in seconds, Android in milliseconds. */
+function notificationTime(date: number): Date {
+  return new Date(date < 1e12 ? date * 1000 : date);
 }
 
 let queue: Promise<void> = Promise.resolve();
@@ -133,7 +142,7 @@ async function handleResponse(
   const data = notification.request.content.data as { start?: number; end?: number };
   if (typeof data?.start !== 'number' || typeof data?.end !== 'number') return;
   // The midnight check-in arrives on the next calendar day but is about the day before.
-  const firedAt = new Date(notification.date);
+  const firedAt = notificationTime(notification.date);
   if (firedAt.getHours() < data.start) firedAt.setDate(firedAt.getDate() - 1);
   const date = dateKey(firedAt);
 

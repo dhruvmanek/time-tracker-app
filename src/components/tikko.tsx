@@ -30,6 +30,7 @@ export type PropId =
   | 'heart'
   | 'wheel'
   | 'clipboard'
+  | 'lotus'
   | 'swirl'
   | 'sunglasses';
 
@@ -55,7 +56,7 @@ const LOOK: Record<Mood, { body: string; rim: string; face: string; bell: string
 };
 
 /** Props drawn in Tikko's hands (the rest are worn or float nearby). */
-const HELD: PropId[] = ['laptop', 'book', 'dumbbell', 'phone', 'gamepad', 'mug', 'basket', 'heart', 'wheel', 'clipboard'];
+const HELD: PropId[] = ['lotus', 'laptop', 'book', 'dumbbell', 'phone', 'gamepad', 'mug', 'basket', 'heart', 'wheel', 'clipboard'];
 
 export function Tikko({ mood, pose = 'idle', prop, stage = 1, size = 200, bounceKey = 0 }: Props) {
   const look = LOOK[mood];
@@ -384,6 +385,15 @@ function HeldProp({ id }: { id: PropId }) {
           <Circle cx="0" cy="0" r="28" fill="none" stroke="#5A5670" strokeWidth={7} />
           <Circle cx="0" cy="0" r="8" fill="#5A5670" />
           <Path d="M-26 0 H-8 M8 0 H26 M0 8 V26" strokeWidth={6} />
+        </G>
+      );
+    case 'lotus':
+      return (
+        <G {...s}>
+          <Path d="M0 10 C-10 -2 -10 -18 0 -30 C10 -18 10 -2 0 10 Z" fill="#F9A8D4" />
+          <Path d="M0 12 C-14 6 -26 -6 -28 -20 C-14 -18 -4 -8 0 12 Z" fill="#F472B6" />
+          <Path d="M0 12 C14 6 26 -6 28 -20 C14 -18 4 -8 0 12 Z" fill="#F472B6" />
+          <Path d="M-32 14 Q0 26 32 14 Q20 24 0 24 Q-20 24 -32 14 Z" fill="#4FBF5A" />
         </G>
       );
     case 'clipboard':

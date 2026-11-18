@@ -42,6 +42,11 @@ async function hydrate() {
         settings: { ...DEFAULT_SETTINGS, ...saved.settings },
         profile: { ...saved.profile },
       };
+      const repaired = repairMisdatedLogs(state.logs);
+      if (repaired !== state.logs) {
+        state = { ...state, logs: repaired };
+        persist();
+      }
     }
   } catch (e) {
     console.warn('Could not load saved data', e);
@@ -51,6 +56,34 @@ async function hydrate() {
   resolveReady();
 }
 hydrate();
+
+/**
+ * An earlier version saved notification quick-logs under a 1970 date (iOS gives
+ * notification times in seconds, not milliseconds). Each log also stores when it
+ * was tapped, so move it back to that day. The hour itself was always correct;
+ * an hour later than the tap time means it was the midnight check-in, so it
+ * belongs to the day before.
+ */
+function repairMisdatedLogs(logs: AppState['logs']): AppState['logs'] {
+  const bad = Object.keys(logs).filter((k) => k < '2000');
+  if (bad.length === 0) return logs;
+  const fixed = { ...logs };
+  for (const key of bad) {
+    for (const [hourStr, log] of Object.entries(logs[key])) {
+      const hour = Number(hourStr);
+      const tapped = new Date(log.loggedAt);
+      if (hour > tapped.getHours()) tapped.setDate(tapped.getDate() - 1);
+      const y = tapped.getFullYear();
+      const m = String(tapped.getMonth() + 1).padStart(2, '0');
+      const d = String(tapped.getDate()).padStart(2, '0');
+      const target = `${y}-${m}-${d}`;
+      // Don't overwrite an hour that was also logged inside the app.
+      if (!fixed[target]?.[hour]) fixed[target] = { ...(fixed[target] ?? {}), [hour]: log };
+    }
+    delete fixed[key];
+  }
+  return fixed;
+}
 
 function emit() {
   listeners.forEach((l) => l());
