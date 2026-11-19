@@ -86,6 +86,13 @@ const POSE_IMAGES: Partial<Record<PoseImage, PoseArt>> = {
   crown: { src: require('@/assets/mascot/crown.png') },
   party: { src: require('@/assets/mascot/party.png'), wide: 1.1 },
   windup: { src: require('@/assets/mascot/windup.png'), wide: 1.02 },
+  happy: { src: require('@/assets/mascot/happy.png') },
+  think: { src: require('@/assets/mascot/think.png') },
+  watch: { src: require('@/assets/mascot/watch.png') },
+  shocked: { src: require('@/assets/mascot/shocked.png') },
+  dreamy: { src: require('@/assets/mascot/dreamy.png') },
+  ring: { src: require('@/assets/mascot/ring.png'), wide: 1.01 },
+  notify: { src: require('@/assets/mascot/notify.png'), wide: 1.09 },
 };
 
 const MOOD_IMAGE: Record<Mood, PoseImage> = {

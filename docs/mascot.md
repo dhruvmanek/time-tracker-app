@@ -44,26 +44,12 @@ Send the images in chat. They get cut out and added to the app.
 | `party.png` | party hat and confetti (Turning on check-ins) |
 | `windup.png` | wind-up key, determined (Hold to wind up) |
 
+More done: `happy`, `think`, `watch`, `shocked`, `dreamy`, `ring`, `notify`.
+
 ## Still needed
 
-**Core**
-
-| File | Pose prompt | Used for |
-|---|---|---|
-| `happy.png` | standing relaxed, arms down, gentle smile | Home on a normal day |
-
-**Onboarding and rewards**
-
-| File | Pose prompt | Used for |
-|---|---|---|
-| `think.png` | thinking, one hand on its chin, eyes looking up | Quiz questions |
-| `watch.png` | looking at the wristwatch on its arm, pointing at it | "How many hours do you lose?" |
-| `shocked.png` | shocked, both hands on its cheeks, mouth open | "Years of your life" and time sinks |
-| `dreamy.png` | dreamy and hopeful, hands clasped, hearts in its eyes | "What would you do with the time?" |
-| `ring.png` | bells ringing loudly with little motion lines, happy | Choosing check-in hours |
-| `notify.png` | holding a phone up, showing a notification on the screen | "Logging takes 2 seconds" |
-
-All 12 activity poses are done.
+Nothing. The full set is complete (27 poses). New ideas can be added any time
+using the prompt above.
 
 ## Originality
 
