@@ -76,6 +76,16 @@ const POSE_IMAGES: Partial<Record<PoseImage, PoseArt>> = {
   mug: { src: require('@/assets/mascot/mug.png') },
   wheel: { src: require('@/assets/mascot/wheel.png') },
   phone: { src: require('@/assets/mascot/phone.png') },
+  clipboard: { src: require('@/assets/mascot/clipboard.png') },
+  heart: { src: require('@/assets/mascot/heart.png') },
+  basket: { src: require('@/assets/mascot/basket.png') },
+  lotus: { src: require('@/assets/mascot/lotus.png'), wide: 1.01 },
+  dumbbell: { src: require('@/assets/mascot/dumbbell.png'), wide: 1.22 },
+  book: { src: require('@/assets/mascot/book.png') },
+  laptop: { src: require('@/assets/mascot/laptop.png') },
+  crown: { src: require('@/assets/mascot/crown.png') },
+  party: { src: require('@/assets/mascot/party.png'), wide: 1.1 },
+  windup: { src: require('@/assets/mascot/windup.png'), wide: 1.02 },
 };
 
 const MOOD_IMAGE: Record<Mood, PoseImage> = {
@@ -173,7 +183,7 @@ export function Tikko({ mood, pose = 'idle', prop, act, sleeping = false, size =
         style={[
           {
             position: 'absolute',
-            bottom: size * 0.005,
+            bottom: size * 0.018,
             left: size * 0.22,
             width: size * 0.56,
             height: size * 0.07,

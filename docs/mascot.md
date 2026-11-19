@@ -33,6 +33,16 @@ Send the images in chat. They get cut out and added to the app.
 | `mug.png` | drinking coffee (Meals & rest) |
 | `wheel.png` | driving a little car (Commute) |
 | `phone.png` | glazed eyes, scrolling a phone (Social media) |
+| `clipboard.png` | clipboard and pencil (Meetings & admin) |
+| `heart.png` | hugging a heart (Friends & family) |
+| `basket.png` | laundry basket (Chores & errands) |
+| `lotus.png` | meditating (Meditation & self-care) |
+| `dumbbell.png` | lifting, sweating (Exercise) |
+| `book.png` | reading (Learning) |
+| `laptop.png` | typing (Deep work) |
+| `crown.png` | crown, hands on hips (Level up) |
+| `party.png` | party hat and confetti (Turning on check-ins) |
+| `windup.png` | wind-up key, determined (Hold to wind up) |
 
 ## Still needed
 
@@ -52,21 +62,8 @@ Send the images in chat. They get cut out and added to the app.
 | `dreamy.png` | dreamy and hopeful, hands clasped, hearts in its eyes | "What would you do with the time?" |
 | `ring.png` | bells ringing loudly with little motion lines, happy | Choosing check-in hours |
 | `notify.png` | holding a phone up, showing a notification on the screen | "Logging takes 2 seconds" |
-| `windup.png` | a big golden wind-up key on its back, determined face | Hold to wind up Tikko |
-| `party.png` | celebrating with confetti and a party hat | Turning on notifications |
-| `crown.png` | proudly wearing a small gold crown | Level up |
 
-**Activities** (Tikko does what you just logged)
-
-| File | Pose prompt | Activity |
-|---|---|---|
-| `laptop.png` | typing on a small laptop, focused | Deep work |
-| `book.png` | reading an open book, curious | Learning |
-| `dumbbell.png` | lifting a dumbbell, sweating, determined | Exercise |
-| `lotus.png` | meditating cross-legged, eyes closed, calm | Meditation & self-care |
-| `basket.png` | carrying a laundry basket | Chores & errands |
-| `heart.png` | hugging a big red heart | Friends & family |
-| `clipboard.png` | holding a clipboard with a checklist and a pencil | Meetings & admin |
+All 12 activity poses are done.
 
 ## Originality
 
