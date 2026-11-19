@@ -61,12 +61,21 @@ type PoseImage =
   | 'sleep'
   | PropId;
 
-const POSE_IMAGES: Partial<Record<PoseImage, number>> = {
-  wave: require('@/assets/mascot/wave.png'),
-  cheer: require('@/assets/mascot/cheer.png'),
-  tired: require('@/assets/mascot/tired.png'),
-  drained: require('@/assets/mascot/drained.png'),
-  sleep: require('@/assets/mascot/sleep.png'),
+/** Pose artwork. `wide` is for scenes wider than Tikko (e.g. the couch): the image
+ * spills out sideways while Tikko itself stays the same size and position. */
+type PoseArt = { src: number; wide?: number };
+
+const POSE_IMAGES: Partial<Record<PoseImage, PoseArt>> = {
+  wave: { src: require('@/assets/mascot/wave.png') },
+  cheer: { src: require('@/assets/mascot/cheer.png') },
+  tired: { src: require('@/assets/mascot/tired.png') },
+  drained: { src: require('@/assets/mascot/drained.png') },
+  sleep: { src: require('@/assets/mascot/sleep.png') },
+  gamepad: { src: require('@/assets/mascot/gamepad.png') },
+  swirl: { src: require('@/assets/mascot/swirl.png'), wide: 1.51 },
+  mug: { src: require('@/assets/mascot/mug.png') },
+  wheel: { src: require('@/assets/mascot/wheel.png') },
+  phone: { src: require('@/assets/mascot/phone.png') },
 };
 
 const MOOD_IMAGE: Record<Mood, PoseImage> = {
@@ -77,7 +86,7 @@ const MOOD_IMAGE: Record<Mood, PoseImage> = {
 };
 
 /** Pick the best available artwork, falling back gracefully. */
-function pickImage(mood: Mood, pose: Pose, prop: PropId | undefined, sleeping: boolean, act?: Act): number {
+function pickImage(mood: Mood, pose: Pose, prop: PropId | undefined, sleeping: boolean, act?: Act): PoseArt {
   const wanted: PoseImage[] = [];
   if (sleeping) wanted.push('sleep');
   if (act) wanted.push(act);
@@ -110,7 +119,8 @@ type Props = {
 };
 
 export function Tikko({ mood, pose = 'idle', prop, act, sleeping = false, size = 200, bounceKey = 0 }: Props) {
-  const source = pickImage(mood, pose, prop, sleeping, act);
+  const art = pickImage(mood, pose, prop, sleeping, act);
+  const wide = art.wide ?? 1;
   const breathe = useSharedValue(0);
   const sway = useSharedValue(0);
   const jump = useSharedValue(0);
@@ -174,7 +184,12 @@ export function Tikko({ mood, pose = 'idle', prop, act, sleeping = false, size =
         ]}
       />
       <Animated.View style={[{ width: size, height: size, transformOrigin: 'bottom' }, bodyStyle]}>
-        <Image source={source} style={{ width: size, height: size }} contentFit="contain" transition={180} />
+        <Image
+          source={art.src}
+          style={{ width: size * wide, height: size, marginLeft: (size - size * wide) / 2 }}
+          contentFit="contain"
+          transition={180}
+        />
       </Animated.View>
     </View>
   );

@@ -28,6 +28,11 @@ Send the images in chat. They get cut out and added to the app.
 | `tired.png` | tired, dark circles, slouching |
 | `drained.png` | exhausted, sweating, drooping |
 | `sleep.png` | asleep in a striped nightcap, zzz |
+| `gamepad.png` | holding a game controller (TV & games) |
+| `swirl.png` | dizzy on a couch (Procrastinating). Wider than Tikko, so it's registered with `wide` |
+| `mug.png` | drinking coffee (Meals & rest) |
+| `wheel.png` | driving a little car (Commute) |
+| `phone.png` | glazed eyes, scrolling a phone (Social media) |
 
 ## Still needed
 
@@ -61,12 +66,7 @@ Send the images in chat. They get cut out and added to the app.
 | `lotus.png` | meditating cross-legged, eyes closed, calm | Meditation & self-care |
 | `basket.png` | carrying a laundry basket | Chores & errands |
 | `heart.png` | hugging a big red heart | Friends & family |
-| `mug.png` | drinking from a coffee mug, cosy | Meals & rest |
-| `wheel.png` | holding a steering wheel, driving | Commute |
 | `clipboard.png` | holding a clipboard with a checklist and a pencil | Meetings & admin |
-| `phone.png` | hunched over a phone, glazed tired eyes, scrolling | Social media |
-| `gamepad.png` | holding a game controller, eyes wide | TV & games |
-| `swirl.png` | lying on a couch, dizzy swirl above its head | Procrastinating |
 
 ## Originality
 
