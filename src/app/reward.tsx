@@ -92,7 +92,7 @@ export default function RewardScreen() {
       ) : null}
 
       <View style={{ alignItems: 'center' }}>
-        <Tikko mood="radiant" prop={CATEGORY_PROPS[cat.id]} size={230} bounceKey={bounce} />
+        <Tikko mood="radiant" act={p.levelUp ? 'crown' : undefined} prop={CATEGORY_PROPS[cat.id]} size={230} bounceKey={bounce} />
       </View>
 
       <Animated.View entering={FadeInDown.delay(150)} style={{ alignItems: 'center', gap: S.sm }}>

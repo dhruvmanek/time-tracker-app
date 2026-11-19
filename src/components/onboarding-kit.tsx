@@ -207,7 +207,7 @@ export function HoldToWind({ onDone }: { onDone: () => void }) {
           />
         </Svg>
         <Animated.View style={wiggle}>
-          <Tikko mood={mood} size={170} bounceKey={done ? 1 : 0} />
+          <Tikko mood={mood} act={done ? undefined : 'windup'} size={170} bounceKey={done ? 1 : 0} />
         </Animated.View>
       </Pressable>
       <Text style={styles.holdHint}>{done ? 'Tikko is wound up and ready! 🎉' : holding ? 'Keep holding…' : 'Press and hold Tikko'}</Text>

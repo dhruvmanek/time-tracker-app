@@ -44,6 +44,9 @@ export default function HomeScreen() {
   const world = activeWorld(state);
   const time = timeOfDay(now);
   const night = time === 'night';
+  // Outside your tracked hours (and nothing to log), Tikko is asleep.
+  const hour = now.getHours();
+  const asleep = !pending && (hour >= state.settings.dayEnd || hour < state.settings.dayStart);
   const recent = recentActivity(state, now);
   const prop = recent ? CATEGORY_PROPS[recent] : undefined;
   const [bubble, setBubble] = useState<string | null>(null);
@@ -93,8 +96,9 @@ export default function HomeScreen() {
             mood={mood}
             pose={cheer && !prop ? 'cheer' : 'idle'}
             prop={prop}
+            sleeping={asleep && !bubble}
             stage={stageForLevel(lvl.level)}
-            size={Math.min(210, width * 0.52)}
+            size={Math.min(240, width * 0.6)}
             bounceKey={bounce}
           />
           {bubble && (
@@ -106,7 +110,7 @@ export default function HomeScreen() {
         </Pressable>
 
         <BigNumber value={String(energy)} suffix="%" />
-        <Text style={styles.moodLine}>{MOOD_LINES[mood]}</Text>
+        <Text style={styles.moodLine}>{asleep ? 'Tikko is asleep. See you in the morning! 😴' : MOOD_LINES[mood]}</Text>
         <View style={{ paddingHorizontal: S.sm }}>
           <ProgressBar value={energy / 100} color={barColor} />
         </View>

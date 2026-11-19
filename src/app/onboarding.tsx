@@ -18,7 +18,7 @@ import {
   type Option,
 } from '@/components/onboarding-kit';
 import { Scene } from '@/components/scene';
-import { Tikko } from '@/components/tikko';
+import { Tikko, type Act } from '@/components/tikko';
 import { Typewriter } from '@/components/typewriter';
 import { BigNumber, Button, Card } from '@/components/ui';
 import { C, F, R, S } from '@/constants/theme';
@@ -169,7 +169,7 @@ export default function Onboarding() {
       break;
     case 'goal':
       body = (
-        <Question title="What do you want from Tikko?">
+        <Question title="What do you want from Tikko?" act="think">
           <OptionList options={GOALS} selected={goal} onToggle={single(setGoal)} />
         </Question>
       );
@@ -177,7 +177,7 @@ export default function Onboarding() {
       break;
     case 'sinks':
       body = (
-        <Question title="Where does your time slip away?" subtitle="Pick all that apply.">
+        <Question title="Where does your time slip away?" subtitle="Pick all that apply." act="shocked" mood="meh">
           <OptionList options={SINKS} selected={sinks} onToggle={multi(sinks, setSinks)} />
         </Question>
       );
@@ -185,7 +185,7 @@ export default function Onboarding() {
       break;
     case 'persona':
       body = (
-        <Question title="Which best describes you?">
+        <Question title="Which best describes you?" act="think">
           <OptionList options={PERSONAS} selected={persona} onToggle={single(setPersona)} />
         </Question>
       );
@@ -193,7 +193,7 @@ export default function Onboarding() {
       break;
     case 'age':
       body = (
-        <Question title="How old are you?" subtitle="Used for one quick calculation. Nothing leaves your phone.">
+        <Question title="How old are you?" subtitle="Used for one quick calculation. Nothing leaves your phone." act="think">
           <OptionList options={AGES} selected={age} onToggle={single(setAge)} />
         </Question>
       );
@@ -201,7 +201,7 @@ export default function Onboarding() {
       break;
     case 'hours':
       body = (
-        <Question title="How many hours a day do you think you lose?" subtitle="Be honest. Tikko doesn’t judge.">
+        <Question title="How many hours a day do you think you lose?" subtitle="Be honest. Tikko doesn’t judge." act="watch">
           <View style={{ alignItems: 'center', marginVertical: S.lg }}>
             <BigNumber value={hours % 1 ? hours.toFixed(1) : String(hours)} suffix={hours === 1 ? ' hour' : ' hours'} size={72} />
           </View>
@@ -216,7 +216,7 @@ export default function Onboarding() {
     case 'shock':
       body = (
         <View style={styles.center}>
-          <Tikko mood="drained" prop="phone" size={170} />
+          <Tikko mood="drained" act="shocked" size={170} />
           <Animated.View entering={FadeInDown.delay(150)} style={styles.shockCard}>
             <Typewriter text={`At ${hours} hours a day, by age 80 you’ll lose`} style={styles.shockSmall} />
             <Animated.View entering={ZoomIn.delay(500).springify().damping(10)}>
@@ -235,7 +235,7 @@ export default function Onboarding() {
       break;
     case 'dream':
       body = (
-        <Question title={`Win back just half: that’s ${fmtYears(lostYears / 2)} years.`} subtitle="What would you spend them on?">
+        <Question title={`Win back just half: that’s ${fmtYears(lostYears / 2)} years.`} subtitle="What would you spend them on?" act="dreamy" mood="radiant">
           {dream.length > 0 && (
             <Animated.View key={dream[0]} entering={ZoomIn.springify().damping(12)} style={styles.dreamBanner}>
               <Text style={styles.dreamSmall}>+{fmtYears(lostYears / 2)} more years of</Text>
@@ -250,7 +250,7 @@ export default function Onboarding() {
     case 'schedule': {
       const count = checkInHours({ dayStart, dayEnd, interval, notificationsOn: true }).length;
       body = (
-        <Question title="When is your day?" subtitle="Tikko only rings while you’re awake.">
+        <Question title="When is your day?" subtitle="Tikko only rings while you’re awake." act="ring">
           <Card style={{ gap: S.md }}>
             <HourRow label="☀️ I wake up around" value={dayStart} min={4} max={dayEnd - 3} onChange={setDayStart} />
             <HourRow label="🌙 I go to bed around" value={dayEnd} min={dayStart + 3} max={24} onChange={setDayEnd} />
@@ -276,7 +276,7 @@ export default function Onboarding() {
     }
     case 'how':
       body = (
-        <Question title="Logging takes 2 seconds" subtitle="When Tikko rings, press and hold the notification, then tap what you did.">
+        <Question title="Logging takes 2 seconds" subtitle="When Tikko rings, press and hold the notification, then tap what you did." act="notify">
           <NotificationPreview />
           <Text style={[styles.lead, { marginTop: S.md }]}>
             Every honest answer earns XP, even the scrolling ones. At night you’ll see exactly where your day went.
@@ -306,7 +306,7 @@ export default function Onboarding() {
     case 'notify':
       body = (
         <View style={styles.center}>
-          <Tikko mood="radiant" pose="cheer" size={200} bounceKey={1} />
+          <Tikko mood="radiant" act="party" size={200} bounceKey={1} />
           <Card style={styles.welcomeCard}>
             <Typewriter text="Let Tikko ring" style={[styles.bigTitle, { fontSize: 30 }]} />
             <Typewriter
@@ -349,11 +349,27 @@ export default function Onboarding() {
   );
 }
 
-function Question({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+function Question({
+  title,
+  subtitle,
+  act,
+  mood = 'happy',
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  /** Tikko's pose for this question. */
+  act?: Act;
+  mood?: Mood;
+  children: ReactNode;
+}) {
   const [typed, setTyped] = useState(false);
   const titleMs = title.length * 26;
   return (
     <View style={{ gap: S.md }}>
+      <View style={{ alignItems: 'center', marginBottom: -S.sm }}>
+        <Tikko mood={mood} act={act} size={130} bounceKey={1} />
+      </View>
       <View style={{ gap: 6 }}>
         <Typewriter text={title} style={styles.qTitle} onDone={subtitle ? undefined : () => setTyped(true)} />
         {subtitle ? (
