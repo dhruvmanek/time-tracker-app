@@ -4,7 +4,6 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { StackedBar } from '@/components/breakdown';
-import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { Timeline } from '@/components/timeline';
 import { Card, Heading, Small, Title } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
@@ -34,8 +33,11 @@ export default function DayScreen() {
       style={{ backgroundColor: C.bg }}
       contentContainerStyle={[
         styles.content,
-        { paddingTop: insets.top + S.sm, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + S.lg },
+        { paddingTop: insets.top + S.sm, paddingBottom: insets.bottom + S.lg },
       ]}>
+      <Pressable onPress={() => router.back()} style={styles.back} accessibilityRole="button" accessibilityLabel="Back">
+        <Text style={styles.arrowText}>‹</Text>
+      </Pressable>
       <Title>Your day</Title>
 
       <View style={styles.dateRow}>
@@ -51,7 +53,7 @@ export default function DayScreen() {
       <Card style={{ gap: S.sm }}>
         <Heading>{summary.logged}h logged</Heading>
         <Small>
-          🎯 {summary.focus}h focus · 😐 {summary.neutral}h neutral · 🌀 {summary.drain}h drain
+          {summary.focus}h focus · {summary.neutral}h other · {summary.drain}h scrolling & distractions
         </Small>
         <StackedBar summary={summary} />
       </Card>
@@ -75,16 +77,26 @@ export default function DayScreen() {
 const styles = StyleSheet.create({
   content: { padding: S.md, gap: S.md },
   dateRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  back: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: C.card,
+    borderWidth: 1,
+    borderColor: C.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   arrow: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: C.card,
-    borderWidth: 2.5,
-    borderColor: C.ink,
+    borderWidth: 1,
+    borderColor: C.line,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  arrowText: { fontFamily: F.bold, fontSize: 26, color: C.ink, marginTop: -3 },
+  arrowText: { fontFamily: F.medium, fontSize: 26, color: C.ink, marginTop: -3 },
   dateLabel: { fontFamily: F.display, fontSize: 22, color: C.ink },
 });

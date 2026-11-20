@@ -1,32 +1,23 @@
+// Home ("Today"): calm and focused. Tikko asks about the hour you haven't logged,
+// one button answers it, and your day so far sits in a single strip below.
+
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import * as Haptics from 'expo-haptics';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Scene, SCENE_PANEL, timeOfDay } from '@/components/scene';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { Tikko } from '@/components/tikko';
-import { BigNumber, Button, ProgressBar } from '@/components/ui';
-import { C, F, R, S } from '@/constants/theme';
-import { CATEGORY_PROPS } from '@/lib/categories';
+import { Button } from '@/components/ui';
+import { C, F, R, S, sticker } from '@/constants/theme';
+import { CATEGORY_PROPS, getCategory } from '@/lib/categories';
 import { onCelebrate } from '@/lib/celebrate';
-import {
-  activeWorld,
-  energyFor,
-  levelInfo,
-  MOOD_LINES,
-  moodForEnergy,
-  pendingRange,
-  recentActivity,
-  stageForLevel,
-  streak,
-  summarize,
-  totalXp,
-} from '@/lib/stats';
+import { energyFor, moodForEnergy, pendingRange, recentActivity, streak, summarize } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
-import { dateKey, formatRange } from '@/lib/time';
+import { dateKey, formatHour, formatRange } from '@/lib/time';
+import type { DayLog, Mood } from '@/lib/types';
 
 export default function HomeScreen() {
   const state = useAppState();
@@ -34,141 +25,166 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const now = useNow();
   const [bounce, setBounce] = useState(0);
+  const [said, setSaid] = useState<string | null>(null);
   useEffect(() => onCelebrate(() => setBounce((n) => n + 1)), []);
-
-  const today = dateKey(now);
-  const pending = pendingRange(state, now);
-  const summary = summarize([state.logs[today]]);
-  const energy = energyFor(summary);
-  const mood = moodForEnergy(energy);
-  const world = activeWorld(state);
-  const time = timeOfDay(now);
-  const night = time === 'night';
-  // Outside your tracked hours (and nothing to log), Tikko is asleep.
-  const hour = now.getHours();
-  const asleep = !pending && (hour >= state.settings.dayEnd || hour < state.settings.dayStart);
-  const recent = recentActivity(state, now);
-  const prop = recent ? CATEGORY_PROPS[recent] : undefined;
-  const [bubble, setBubble] = useState<string | null>(null);
-  const [cheer, setCheer] = useState(false);
-
-  // Tap Tikko: it jumps, rings and says something.
-  const poke = () => {
-    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setBounce((n) => n + 1);
-    const lines = pending ? PENDING_LINES : LINES[mood];
-    setBubble(lines[Math.floor(Math.random() * lines.length)]);
-    setCheer(true);
-  };
   useEffect(() => {
-    if (!bubble) return;
-    const t = setTimeout(() => {
-      setBubble(null);
-      setCheer(false);
-    }, 2600);
+    if (!said) return;
+    const t = setTimeout(() => setSaid(null), 3000);
     return () => clearTimeout(t);
-  }, [bubble]);
-  const lvl = levelInfo(totalXp(state));
+  }, [said]);
+
+  const { dayStart, dayEnd } = state.settings;
+  const today = dateKey(now);
+  const day = state.logs[today] ?? {};
+  const summary = summarize([day]);
+  const mood = moodForEnergy(energyFor(summary));
+  const pending = pendingRange(state, now);
+  const hour = now.getHours();
+  const asleep = !pending && (hour >= dayEnd || hour < dayStart);
+  const recent = recentActivity(state, now);
   const days = streak(state, now);
-  const barColor = energy >= 60 ? C.good : energy >= 40 ? C.warn : C.drain;
+  const due = Math.max(0, Math.min(hour, dayEnd) - dayStart);
+
+  const question = pending
+    ? `What did you do from ${formatRange(pending.start, pending.end).replace('–', ' to ')}?`
+    : asleep
+      ? 'Zzz… see you in the morning.'
+      : summaryLine(summary.logged, summary.focus, summary.drain, mood);
+
+  const poke = () => {
+    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setBounce((n) => n + 1);
+    const lines = TAP_LINES[mood];
+    setSaid(lines[Math.floor(Math.random() * lines.length)]);
+  };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Scene mood={mood} world={world} time={time} />
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: insets.top + S.sm, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + S.lg },
-        ]}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>⭐ {lvl.level}</Text>
-          </View>
-          <Text style={[styles.logo, night && { color: '#FFFFFF' }]}>TIKKO</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>🔥 {days}</Text>
-          </View>
+    <ScrollView
+      style={{ backgroundColor: C.bg }}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + S.sm, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + S.lg },
+      ]}
+      showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.date}>
+            {now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }).toUpperCase()}
+          </Text>
+          <Text style={styles.greeting}>{greeting(hour)}</Text>
         </View>
-
-        <Pressable onPress={poke} style={styles.tikk} accessibilityRole="button" accessibilityLabel="Tap Tikko">
-          <Tikko
-            mood={mood}
-            pose={cheer && !prop ? 'cheer' : 'idle'}
-            prop={prop}
-            sleeping={asleep && !bubble}
-            stage={stageForLevel(lvl.level)}
-            size={Math.min(240, width * 0.6)}
-            bounceKey={bounce}
-          />
-          {bubble && (
-            <Animated.View entering={FadeIn.duration(150)} exiting={FadeOut.duration(200)} style={styles.bubble}>
-              <Text style={styles.bubbleText}>{bubble}</Text>
-              <View style={styles.bubbleTail} />
-            </Animated.View>
-          )}
-        </Pressable>
-
-        <BigNumber value={String(energy)} suffix="%" />
-        <Text style={styles.moodLine}>{asleep ? 'Tikko is asleep. See you in the morning! 😴' : MOOD_LINES[mood]}</Text>
-        <View style={{ paddingHorizontal: S.sm }}>
-          <ProgressBar value={energy / 100} color={barColor} />
+        <View style={styles.streak} accessibilityLabel={`${days} day streak`}>
+          <Text style={styles.streakText}>🔥 {days}</Text>
         </View>
+      </View>
 
-        <View style={styles.stats}>
-          <Stat bg={SCENE_PANEL} icon="🎯" value={`${summary.focus}h`} label="Focus" />
-          <Stat bg={SCENE_PANEL} icon="🌀" value={`${summary.drain}h`} label="Drain" />
-          <Stat bg={SCENE_PANEL} icon="✅" value={`${summary.logged}h`} label="Logged" />
-        </View>
+      <View style={styles.bubbleWrap}>
+        <Animated.View key={said ?? question} entering={FadeIn.duration(200)} style={styles.bubble}>
+          <Text style={styles.bubbleText}>{said ?? question}</Text>
+          <View style={styles.bubbleTail} />
+        </Animated.View>
+      </View>
 
-        {pending ? (
-          <Button
-            variant="light"
-            label={`🔔 Log ${formatRange(pending.start, pending.end)}`}
-            onPress={() =>
-              router.push({
-                pathname: '/check-in',
-                params: { date: today, start: String(pending.start), end: String(pending.end) },
-              })
-            }
-          />
-        ) : (
-          <View style={[styles.caughtUp, { backgroundColor: SCENE_PANEL }]}>
-            <Text style={styles.caughtUpText}>✨ All caught up. Tikko will ring at the next hour.</Text>
-          </View>
-        )}
+      <Pressable onPress={poke} style={styles.tikko} accessibilityRole="button" accessibilityLabel="Tap Tikko">
+        <Tikko
+          mood={mood}
+          prop={recent && !said ? CATEGORY_PROPS[recent] : undefined}
+          pose={said ? 'cheer' : 'idle'}
+          sleeping={asleep && !said}
+          size={Math.min(250, width * 0.62)}
+          bounceKey={bounce}
+        />
+      </Pressable>
 
-        <View style={[styles.xpRow, { backgroundColor: SCENE_PANEL }]}>
-          <Text style={styles.xpText}>Level {lvl.level}</Text>
-          <View style={{ flex: 1 }}>
-            <ProgressBar value={lvl.xpIntoLevel / lvl.xpForLevel} color={C.sand} height={14} />
-          </View>
-          <Text style={styles.xpText}>
-            {lvl.xpIntoLevel}/{lvl.xpForLevel} XP
+      {pending ? (
+        <Button
+          label={`Log ${formatRange(pending.start, pending.end)}`}
+          onPress={() =>
+            router.push({
+              pathname: '/check-in',
+              params: { date: today, start: String(pending.start), end: String(pending.end) },
+            })
+          }
+        />
+      ) : (
+        <Button variant="light" label="See your whole day" onPress={() => router.push('/day')} />
+      )}
+
+      <Pressable onPress={() => router.push('/day')} style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardLabel}>TODAY</Text>
+          <Text style={styles.cardMeta}>
+            {summary.logged} of {due} hours logged ›
           </Text>
         </View>
-      </ScrollView>
-    </View>
+        <DayStrip day={day} dayStart={dayStart} dayEnd={dayEnd} hour={hour} />
+        <View style={styles.times}>
+          <Text style={styles.time}>{formatHour(dayStart)}</Text>
+          {hour > dayStart && hour < dayEnd ? <Text style={styles.time}>Now</Text> : null}
+          <Text style={styles.time}>{dayEnd === 24 ? '12 AM' : formatHour(dayEnd)}</Text>
+        </View>
+        <View style={styles.legend}>
+          <Legend color={C.focus} label={`${summary.focus}h focus`} />
+          <Legend color={C.neutral} label={`${summary.neutral}h other`} />
+          <Legend color={C.drain} label={`${summary.drain}h scrolling`} />
+        </View>
+      </Pressable>
+    </ScrollView>
   );
 }
 
-const LINES: Record<string, string[]> = {
-  radiant: ['Ding ding! We’re on fire 🔥', 'Best. Day. Ever.', 'Keep this up and I’ll get a crown 👑'],
-  happy: ['Tick tock, looking good!', 'Hehe, that tickles!', 'One hour at a time 💪'],
-  meh: ['I’m running a bit slow…', 'A focused hour would cheer me up', 'Wind me up a little?'],
-  drained: ['So… much… scrolling…', 'My battery is low 🪫', 'Help me recharge? One focused hour!'],
-};
-const PENDING_LINES = ['Psst! You haven’t logged your last hour', 'Ring ring! What did you just do?', 'Tell me about your last hour ⏰'];
+/** One small block per hour: coloured if logged, dashed if missed, pale if still ahead. */
+function DayStrip({ day, dayStart, dayEnd, hour }: { day: DayLog; dayStart: number; dayEnd: number; hour: number }) {
+  const blocks = [];
+  for (let h = dayStart; h < dayEnd; h++) {
+    const log = day[h];
+    const kind = log ? getCategory(log.categoryId).kind : null;
+    const missed = !log && h < hour;
+    blocks.push(
+      <View
+        key={h}
+        style={[
+          styles.block,
+          kind === 'focus' && { backgroundColor: C.focus },
+          kind === 'neutral' && { backgroundColor: C.neutral },
+          kind === 'drain' && { backgroundColor: C.drain },
+          missed && styles.missed,
+        ]}
+      />,
+    );
+  }
+  return <View style={styles.strip}>{blocks}</View>;
+}
 
-function Stat({ bg, icon, value, label }: { bg: string; icon: string; value: string; label: string }) {
+function Legend({ color, label }: { color: string; label: string }) {
   return (
-    <View style={[styles.stat, { backgroundColor: bg }]}>
-      <Text style={{ fontSize: 22 }}>{icon}</Text>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={styles.legendItem}>
+      <View style={[styles.dot, { backgroundColor: color }]} />
+      <Text style={styles.legendText}>{label}</Text>
     </View>
   );
 }
+
+function greeting(h: number) {
+  if (h < 5) return 'Still up?';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function summaryLine(logged: number, focus: number, drain: number, mood: Mood) {
+  if (logged === 0) return 'I’ll ring at the next hour. See you then!';
+  if (mood === 'radiant') return `${focus}h of focus already. We’re on fire!`;
+  if (mood === 'drained') return `${drain}h lost to scrolling. One focused hour?`;
+  return `All caught up. ${logged}h logged so far.`;
+}
+
+const TAP_LINES: Record<Mood, string[]> = {
+  radiant: ['Ding ding! 🔔', 'Best day ever!', 'Keep it going!'],
+  happy: ['Hehe, that tickles!', 'Tick tock!', 'One hour at a time.'],
+  meh: ['Running a bit slow…', 'Wind me up a little?', 'A focused hour would help.'],
+  drained: ['So… much… scrolling…', 'My battery is low 🪫', 'Help me recharge?'],
+};
 
 /** Re-render every minute so the pending check-in stays current. */
 function useNow() {
@@ -181,60 +197,46 @@ function useNow() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: S.md, gap: S.md - 4 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  logo: { fontFamily: F.display, fontSize: 30, color: C.ink, letterSpacing: 1.5 },
-  badge: {
-    minWidth: 64,
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.6)',
-    borderRadius: R.pill,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  badgeText: { fontFamily: F.display, fontSize: 18, color: C.ink },
-  tikk: { alignItems: 'center', marginTop: S.sm },
+  content: { paddingHorizontal: S.md + 4, gap: S.md },
+  header: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: S.xs },
+  date: { fontFamily: F.medium, fontSize: 12.5, color: C.sub, letterSpacing: 0.4 },
+  greeting: { fontFamily: F.display, fontSize: 27, color: C.ink, marginTop: 2 },
+  streak: { ...sticker, backgroundColor: C.card, borderRadius: R.pill, paddingVertical: 6, paddingHorizontal: 12 },
+  streakText: { fontFamily: F.semibold, fontSize: 14, color: C.ink },
+  bubbleWrap: { alignItems: 'center', marginTop: S.md },
   bubble: {
-    position: 'absolute',
-    top: -6,
-    zIndex: 2,
-    maxWidth: 240,
-    backgroundColor: '#FFFFFF',
-    borderRadius: R.md,
-    borderWidth: 3,
-    borderColor: C.ink,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    ...sticker,
+    backgroundColor: C.card,
+    borderRadius: 18,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    maxWidth: 320,
   },
-  bubbleText: { fontFamily: F.bold, fontSize: 14.5, color: C.ink, textAlign: 'center' },
+  bubbleText: { fontFamily: F.medium, fontSize: 16, color: C.ink, textAlign: 'center', lineHeight: 22 },
   bubbleTail: {
     position: 'absolute',
-    bottom: -9,
+    bottom: -7,
     alignSelf: 'center',
-    width: 14,
-    height: 14,
-    backgroundColor: '#FFFFFF',
-    borderRightWidth: 3,
-    borderBottomWidth: 3,
-    borderColor: C.ink,
+    width: 13,
+    height: 13,
+    backgroundColor: C.card,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: C.line,
     transform: [{ rotate: '45deg' }],
   },
-  moodLine: {
-    fontFamily: F.bold,
-    fontSize: 17,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.25)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 0,
-    marginTop: -S.md,
-  },
-  stats: { flexDirection: 'row', gap: S.sm, marginTop: S.xs },
-  stat: { flex: 1, alignItems: 'center', borderRadius: R.md, paddingVertical: 10 },
-  statValue: { fontFamily: F.display, fontSize: 22, color: '#FFFFFF', marginTop: 2 },
-  statLabel: { fontFamily: F.semibold, fontSize: 12.5, color: 'rgba(255,255,255,0.92)' },
-  caughtUp: { borderRadius: R.md, padding: 14, alignItems: 'center' },
-  caughtUpText: { fontFamily: F.semibold, fontSize: 15, color: '#FFFFFF', textAlign: 'center' },
-  xpRow: { flexDirection: 'row', alignItems: 'center', gap: S.sm, borderRadius: R.md, padding: 10 },
-  xpText: { fontFamily: F.semibold, fontSize: 13, color: '#FFFFFF' },
+  tikko: { alignItems: 'center', marginTop: -S.xs, marginBottom: S.xs },
+  card: { ...sticker, backgroundColor: C.card, borderRadius: R.lg, padding: S.md },
+  cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  cardLabel: { fontFamily: F.semibold, fontSize: 12, color: C.sub, letterSpacing: 0.6 },
+  cardMeta: { fontFamily: F.medium, fontSize: 13, color: C.sub },
+  strip: { flexDirection: 'row', gap: 3, marginTop: 12 },
+  block: { flex: 1, height: 28, borderRadius: 6, backgroundColor: C.empty },
+  missed: { backgroundColor: C.card, borderWidth: 1.5, borderColor: C.neutral, borderStyle: 'dashed' },
+  times: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
+  time: { fontFamily: F.medium, fontSize: 11.5, color: C.sub },
+  legend: { flexDirection: 'row', gap: S.md, marginTop: 12, flexWrap: 'wrap' },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  dot: { width: 9, height: 9, borderRadius: 3 },
+  legendText: { fontFamily: F.semibold, fontSize: 13.5, color: C.ink },
 });

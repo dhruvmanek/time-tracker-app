@@ -128,9 +128,9 @@ function Tile({
       onPress={onPress}
       style={({ pressed }) => [
         styles.tile,
-        { backgroundColor: tint(c.color) },
+        { backgroundColor: C.card },
         big && { paddingVertical: 16 },
-        selected && { borderColor: c.color, borderWidth: 4 },
+        selected && { borderColor: C.accent, borderWidth: 2, backgroundColor: C.accentSoft },
         pressed && { transform: [{ translateY: 3 }], shadowOffset: { width: 0, height: 1 } },
       ]}>
       <Text style={{ fontSize: big ? 32 : 26 }}>{c.emoji}</Text>
@@ -139,13 +139,6 @@ function Tile({
       </Text>
     </Pressable>
   );
-}
-
-/** A light pastel version of a category colour. */
-function tint(hex: string) {
-  const n = parseInt(hex.slice(1), 16);
-  const mix = (v: number) => Math.round(v + (255 - v) * 0.72);
-  return `rgb(${mix((n >> 16) & 255)}, ${mix((n >> 8) & 255)}, ${mix(n & 255)})`;
 }
 
 function Stepper({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {

@@ -4,7 +4,7 @@ import {
   Fredoka_600SemiBold,
   Fredoka_700Bold,
 } from '@expo-google-fonts/fredoka';
-import { LilitaOne_400Regular } from '@expo-google-fonts/lilita-one';
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
 import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -21,7 +21,10 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const hydrated = useHydrated();
   const [fontsLoaded, fontError] = useFonts({
-    LilitaOne_400Regular,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
     Fredoka_400Regular,
     Fredoka_500Medium,
     Fredoka_600SemiBold,
@@ -55,6 +58,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="day" />
         <Stack.Screen
           name="reward"
           options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }}

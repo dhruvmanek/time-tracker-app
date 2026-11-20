@@ -1,29 +1,39 @@
-// Tikko's look: thick dark outlines, bold flat colours, chunky rounded type.
+// Tikko's look: calm and premium. A warm off-white page, white cards with hairline
+// borders, one teal accent (from Tikko's rim), and Tikko as the only colourful thing.
 // Change values here to restyle the whole app.
 
 export const C = {
-  ink: '#1E1A2E',
-  sub: '#6E6880',
-  faint: '#CFC9DC',
+  ink: '#22252B',
+  sub: '#8A8F98',
+  faint: '#D9D6D0',
+  line: '#ECEAE6',
   white: '#FFFFFF',
-  bg: '#F3EFFA', // lavender page background for non-scene screens
+  bg: '#FAF8F5',
   card: '#FFFFFF',
-  cardAlt: '#ECE6F6',
-  sand: '#FFC93C',
-  coral: '#FF6F5B',
-  focus: '#2FB37A',
-  neutral: '#8E9BB0',
-  drain: '#E2574C',
-  good: '#4FD15E',
-  warn: '#FFB020',
+  cardAlt: '#F2F0EC',
+  /** The one accent colour: buttons, selection, active tab. */
+  accent: '#1E9A93',
+  accentSoft: '#E3F4F2',
+  // Data colours, used only in charts and the day strip.
+  focus: '#3FA88A',
+  neutral: '#C9CDD3',
+  drain: '#E07A6B',
+  empty: '#EFEDE9',
+  // Kept for the few celebratory spots.
+  sand: '#F6C453',
+  coral: '#E07A6B',
+  good: '#3FA88A',
+  warn: '#E8B04A',
 } as const;
 
 export const F = {
-  display: 'LilitaOne_400Regular',
-  regular: 'Fredoka_400Regular',
-  medium: 'Fredoka_500Medium',
-  semibold: 'Fredoka_600SemiBold',
-  bold: 'Fredoka_700Bold',
+  /** Friendly rounded headings. */
+  display: 'Fredoka_600SemiBold',
+  regular: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semibold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  round: 'Fredoka_600SemiBold',
 } as const;
 
 export const S = {
@@ -36,18 +46,18 @@ export const S = {
 
 export const R = {
   sm: 12,
-  md: 18,
-  lg: 24,
+  md: 16,
+  lg: 22,
   pill: 999,
 } as const;
 
-/** The "sticker" look: thick outline plus a hard drop shadow underneath. */
+/** Card surface: hairline border and a soft, low shadow. (Name kept from the old style.) */
 export const sticker = {
-  borderWidth: 3,
-  borderColor: C.ink,
-  shadowColor: C.ink,
-  shadowOpacity: 1,
-  shadowRadius: 0,
+  borderWidth: 1,
+  borderColor: C.line,
+  shadowColor: '#000',
+  shadowOpacity: 0.04,
+  shadowRadius: 10,
   shadowOffset: { width: 0, height: 4 },
-  elevation: 0,
+  elevation: 1,
 } as const;

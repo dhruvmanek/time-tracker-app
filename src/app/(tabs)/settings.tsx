@@ -5,18 +5,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Body, Button, Card, Heading, Small, Title } from '@/components/ui';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
-import { C, F, R, S } from '@/constants/theme';
+import { C, F, R, S, sticker } from '@/constants/theme';
 import { requestPermission, rescheduleAll, sendTestNotification } from '@/lib/notifications';
-import { WORLDS } from '@/components/scene';
-import { activeWorld, checkInHours, goodDays } from '@/lib/stats';
+import { checkInHours } from '@/lib/stats';
 import { replayOnboarding, resetAll, updateSettings, useAppState } from '@/lib/store';
 import { formatHour } from '@/lib/time';
 
 export default function SettingsScreen() {
-  const state = useAppState();
-  const { settings } = state;
-  const days = goodDays(state);
-  const current = activeWorld(state);
+  const { settings } = useAppState();
   const insets = useSafeAreaInsets();
 
   // Re-schedule whenever the check-in settings change.
@@ -41,7 +37,7 @@ export default function SettingsScreen() {
           <Body>Reminders</Body>
           <Switch
             value={settings.notificationsOn}
-            trackColor={{ true: C.good }}
+            trackColor={{ true: C.accent }}
             onValueChange={async (on) => {
               if (on && !(await requestPermission()) && Platform.OS !== 'web') {
                 Alert.alert('Notifications are off', 'Turn on notifications for Tikko in the iPhone Settings app.');
@@ -84,28 +80,6 @@ export default function SettingsScreen() {
         </Small>
         <Button label="Send a test notification" variant="light" onPress={sendTestNotification} />
         <Small>Arrives in 5 seconds. Lock your phone, then long-press it to see the quick-log buttons.</Small>
-      </Card>
-
-      <Card style={{ gap: S.sm }}>
-        <Heading>Worlds</Heading>
-        <Small>Unlock new worlds with good days (4+ hours logged). You have {days}.</Small>
-        <View style={styles.worlds}>
-          {WORLDS.map((w) => {
-            const locked = days < w.goodDays;
-            const on = current === w.id;
-            return (
-              <Pressable
-                key={w.id}
-                disabled={locked}
-                onPress={() => updateSettings({ world: w.id })}
-                style={[styles.world, on && styles.worldOn, locked && { opacity: 0.45 }]}>
-                <Text style={{ fontSize: 28 }}>{locked ? '🔒' : w.emoji}</Text>
-                <Text style={styles.worldName}>{w.name}</Text>
-                <Text style={styles.worldSub}>{locked ? `${w.goodDays} good days` : on ? 'Active' : 'Unlocked'}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
       </Card>
 
       <Card style={{ gap: S.sm }}>
@@ -167,7 +141,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 3 },
   segItem: { paddingVertical: 6, paddingHorizontal: 16, borderRadius: R.pill },
-  segActive: { backgroundColor: C.sand },
+  segActive: { backgroundColor: C.card, ...sticker },
   segText: { fontFamily: F.bold, color: C.ink },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: S.sm },
   stepBtn: {
@@ -179,19 +153,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   stepText: { fontSize: 22, fontFamily: F.bold, color: C.ink, marginTop: -2 },
-  worlds: { flexDirection: 'row', flexWrap: 'wrap', gap: S.sm },
-  world: {
-    width: '47%',
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: R.md,
-    borderWidth: 2.5,
-    borderColor: C.faint,
-    backgroundColor: C.card,
-  },
-  worldOn: { borderColor: C.ink, backgroundColor: '#FFF0C2' },
-  worldName: { fontFamily: F.bold, fontSize: 15, color: C.ink, marginTop: 2 },
-  worldSub: { fontFamily: F.medium, fontSize: 12.5, color: C.sub },
   stepValue: { width: 80, textAlign: 'center', fontFamily: F.bold, color: C.ink },
 });

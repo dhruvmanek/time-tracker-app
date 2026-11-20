@@ -181,7 +181,7 @@ export function Tikko({ mood, pose = 'idle', prop, act, sleeping = false, size =
   });
   const shadowStyle = useAnimatedStyle(() => ({
     transform: [{ scaleX: 1 + Math.min(jump.value, 0) / 90 }],
-    opacity: 0.16 + Math.min(jump.value, 0) / 400,
+    opacity: 0.07 + Math.min(jump.value, 0) / 800,
   }));
 
   return (
@@ -191,9 +191,9 @@ export function Tikko({ mood, pose = 'idle', prop, act, sleeping = false, size =
           {
             position: 'absolute',
             bottom: size * 0.018,
-            left: size * 0.22,
-            width: size * 0.56,
-            height: size * 0.07,
+            left: size * 0.26,
+            width: size * 0.48,
+            height: size * 0.04,
             borderRadius: size,
             backgroundColor: '#000',
           },

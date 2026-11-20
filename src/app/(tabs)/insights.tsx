@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CategoryBars } from '@/components/breakdown';
 import { Body, Card, Heading, Small, Title } from '@/components/ui';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
-import { C, F, R, S } from '@/constants/theme';
+import { C, F, R, S, sticker } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
 import { drainByHour, summarize } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
@@ -31,7 +31,7 @@ export default function InsightsScreen() {
         styles.content,
         { paddingTop: insets.top + S.sm, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + S.lg },
       ]}>
-      <Title>Stats</Title>
+      <Title>Insights</Title>
 
       <View style={styles.segment}>
         {(['today', 'week'] as Range[]).map((r) => (
@@ -158,9 +158,9 @@ function Legend({ color, label }: { color: string; label: string }) {
 
 const styles = StyleSheet.create({
   content: { padding: S.md, gap: S.md },
-  segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 4, borderWidth: 2.5, borderColor: C.ink },
+  segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 4 },
   segItem: { flex: 1, paddingVertical: 10, borderRadius: R.pill, alignItems: 'center' },
-  segActive: { backgroundColor: C.sand, borderWidth: 2.5, borderColor: C.ink },
+  segActive: { backgroundColor: C.card, ...sticker },
   segText: { fontFamily: F.bold, fontSize: 15, color: C.sub },
   statsRow: { flexDirection: 'row', gap: S.sm },
   stat: { flex: 1, alignItems: 'center', gap: 2, paddingHorizontal: S.sm },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   sink: { flexDirection: 'row', alignItems: 'center', gap: S.md },
   chart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 145 },
   chartCol: { alignItems: 'center', gap: 6, flex: 1 },
-  chartBar: { width: 24, borderRadius: 7, overflow: 'hidden', minHeight: 4, backgroundColor: C.cardAlt, borderWidth: 2, borderColor: C.ink },
+  chartBar: { width: 22, borderRadius: 7, overflow: 'hidden', minHeight: 4, backgroundColor: C.cardAlt },
   legend: { flexDirection: 'row', gap: S.md, justifyContent: 'center' },
   dangerRow: { flexDirection: 'row', justifyContent: 'space-between' },
 });

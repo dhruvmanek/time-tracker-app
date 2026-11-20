@@ -192,12 +192,12 @@ export function HoldToWind({ onDone }: { onDone: () => void }) {
     <View style={{ alignItems: 'center', gap: S.lg }}>
       <Pressable onPressIn={start} onPressOut={stop} style={{ width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
         <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
-          <Circle cx={SIZE / 2} cy={SIZE / 2} r={RADIUS} stroke="#FFFFFF" strokeWidth={14} fill="rgba(255,255,255,0.35)" />
+          <Circle cx={SIZE / 2} cy={SIZE / 2} r={RADIUS} stroke={C.cardAlt} strokeWidth={12} fill={C.card} />
           <AnimatedCircle
             cx={SIZE / 2}
             cy={SIZE / 2}
             r={RADIUS}
-            stroke={C.sand}
+            stroke={C.accent}
             strokeWidth={14}
             fill="none"
             strokeLinecap="round"
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     borderColor: C.ink,
     overflow: 'hidden',
   },
-  progressFill: { height: '100%', backgroundColor: C.sand },
+  progressFill: { height: '100%', backgroundColor: C.accent },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     ...sticker,
   },
-  optionOn: { backgroundColor: '#FFF0C2' },
+  optionOn: { backgroundColor: C.accentSoft, borderColor: C.accent },
   optionEmoji: { fontSize: 24 },
   optionLabel: { flex: 1, fontFamily: F.semibold, fontSize: 16.5, color: C.ink },
   check: {
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     borderColor: C.ink,
     overflow: 'hidden',
   },
-  sliderFill: { height: '100%', backgroundColor: C.coral },
+  sliderFill: { height: '100%', backgroundColor: C.accent },
   thumb: {
     position: 'absolute',
     top: 2,

@@ -7,7 +7,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tikko } from '@/components/tikko';
 import { BigNumber, Button } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
-import { WORLDS } from '@/components/scene';
 import { CATEGORY_PROPS, getCategory } from '@/lib/categories';
 import { celebrate } from '@/lib/celebrate';
 import type { RewardParams } from '@/lib/log';
@@ -16,11 +15,11 @@ import { useAppState } from '@/lib/store';
 import { dateKey } from '@/lib/time';
 
 const GLOW = [
-  { r: 1.15, color: '#FFC25E' },
-  { r: 0.9, color: '#FFCF7A' },
-  { r: 0.68, color: '#FFDC98' },
-  { r: 0.46, color: '#FFE8B6' },
-  { r: 0.26, color: '#FFF2D2' },
+  { r: 1.15, color: '#F4F1EC' },
+  { r: 0.9, color: '#EFF7F5' },
+  { r: 0.68, color: '#E6F4F1' },
+  { r: 0.46, color: '#DDF0EC' },
+  { r: 0.26, color: '#D3ECE7' },
 ];
 
 /** The little celebration after every check-in. */
@@ -77,14 +76,6 @@ export default function RewardScreen() {
         <BigNumber value={`+${p.xp ?? 0}`} suffix=" XP" size={76} />
       </Animated.View>
 
-      {p.newWorld ? (
-        <Animated.View entering={FadeInDown.delay(450)} style={styles.levelUp}>
-          <Text style={styles.levelUpText}>
-            {WORLDS.find((w) => w.id === p.newWorld)?.emoji} New world unlocked: {WORLDS.find((w) => w.id === p.newWorld)?.name}!
-          </Text>
-        </Animated.View>
-      ) : null}
-
       {p.levelUp ? (
         <Animated.View entering={FadeInDown.delay(300)} style={styles.levelUp}>
           <Text style={styles.levelUpText}>⭐ Level up! You’re now level {p.levelUp}</Text>
@@ -109,10 +100,10 @@ export default function RewardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFB547', paddingHorizontal: S.lg, justifyContent: 'space-between', alignItems: 'center' },
+  container: { flex: 1, backgroundColor: C.bg, paddingHorizontal: S.lg, justifyContent: 'space-between', alignItems: 'center' },
   title: { fontFamily: F.display, fontSize: 32, color: C.ink, textAlign: 'center' },
   cat: { fontFamily: F.bold, fontSize: 18, color: C.ink },
-  streak: { fontFamily: F.medium, fontSize: 16, color: '#6B4A2A', textAlign: 'center', paddingHorizontal: S.md },
+  streak: { fontFamily: F.medium, fontSize: 16, color: C.sub, textAlign: 'center', paddingHorizontal: S.md },
   levelUp: { backgroundColor: C.ink, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 8 },
   levelUpText: { fontFamily: F.bold, color: '#FFFFFF', fontSize: 15 },
 });

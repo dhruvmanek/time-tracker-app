@@ -54,7 +54,7 @@ export function Button({
         variant === 'primary' && styles.buttonPrimary,
         variant === 'light' && styles.buttonLight,
         variant === 'ghost' && styles.buttonGhost,
-        pressed && variant !== 'ghost' && { transform: [{ translateY: 3 }], shadowOffset: { width: 0, height: 1 } },
+        pressed && variant !== 'ghost' && { transform: [{ scale: 0.98 }], opacity: 0.92 },
         disabled && { opacity: 0.4 },
         style,
       ]}>
@@ -63,7 +63,7 @@ export function Button({
   );
 }
 
-export function ProgressBar({ value, color = C.good, height = 18 }: { value: number; color?: string; height?: number }) {
+export function ProgressBar({ value, color = C.accent, height = 10 }: { value: number; color?: string; height?: number }) {
   return (
     <View style={[styles.track, { height }]}>
       <View
@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
     padding: S.md,
     ...sticker,
   },
-  title: { fontFamily: F.display, fontSize: 34, color: C.ink, letterSpacing: 0.3 },
-  heading: { fontFamily: F.bold, fontSize: 19, color: C.ink },
+  title: { fontFamily: F.display, fontSize: 32, color: C.ink },
+  heading: { fontFamily: F.semibold, fontSize: 17, color: C.ink },
   body: { fontFamily: F.medium, fontSize: 16, color: C.ink, lineHeight: 22 },
   small: { fontFamily: F.medium, fontSize: 13.5, color: C.sub, lineHeight: 19 },
   button: {
@@ -122,15 +122,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonPrimary: { backgroundColor: C.ink, ...sticker, borderColor: C.ink, shadowColor: '#000' },
+  buttonPrimary: {
+    backgroundColor: C.accent,
+    shadowColor: C.accent,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+  },
   buttonLight: { backgroundColor: C.white, ...sticker },
   buttonGhost: { backgroundColor: 'transparent' },
-  buttonText: { fontFamily: F.display, color: '#FFFFFF', fontSize: 20, letterSpacing: 0.3 },
+  buttonText: { fontFamily: F.semibold, color: '#FFFFFF', fontSize: 17 },
   track: {
     borderRadius: R.pill,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
+    backgroundColor: C.cardAlt,
     overflow: 'hidden',
   },
   fill: { height: '100%', borderRadius: R.pill },

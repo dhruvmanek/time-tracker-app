@@ -47,7 +47,7 @@ export function CategoryBars({ summary }: { summary: DaySummary }) {
 }
 
 const styles = StyleSheet.create({
-  stack: { flexDirection: 'row', height: 20, borderRadius: R.pill, overflow: 'hidden', gap: 2, borderWidth: 2.5, borderColor: C.ink },
+  stack: { flexDirection: 'row', height: 20, borderRadius: R.pill, overflow: 'hidden', gap: 2 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between' },
   label: { fontSize: 15, fontFamily: F.semibold, color: C.ink },
   value: { fontSize: 13.5, color: C.sub, fontFamily: F.semibold },

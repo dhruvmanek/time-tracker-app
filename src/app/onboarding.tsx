@@ -17,11 +17,10 @@ import {
   ProgressHeader,
   type Option,
 } from '@/components/onboarding-kit';
-import { Scene } from '@/components/scene';
 import { Tikko, type Act } from '@/components/tikko';
 import { Typewriter } from '@/components/typewriter';
 import { BigNumber, Button, Card } from '@/components/ui';
-import { C, F, R, S } from '@/constants/theme';
+import { C, F, R, S, sticker } from '@/constants/theme';
 import { requestPermission, rescheduleAll } from '@/lib/notifications';
 import { checkInHours } from '@/lib/stats';
 import { completeOnboarding, updateProfile, updateSettings } from '@/lib/store';
@@ -76,15 +75,7 @@ const DREAMS: Option[] = [
 ];
 
 const STEPS = ['welcome', 'goal', 'sinks', 'persona', 'age', 'hours', 'shock', 'dream', 'schedule', 'how', 'wind', 'notify'] as const;
-type Step = (typeof STEPS)[number];
 
-/** Steps drawn over Tikko's world (the rest use the plain lavender page). */
-const SCENE_STEPS: Partial<Record<Step, Mood>> = {
-  welcome: 'happy',
-  shock: 'drained',
-  wind: 'happy',
-  notify: 'radiant',
-};
 
 export default function Onboarding() {
   const insets = useSafeAreaInsets();
@@ -327,12 +318,10 @@ export default function Onboarding() {
       break;
   }
 
-  const sceneMood = SCENE_STEPS[step];
   const progress = i / (STEPS.length - 1);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
-      {sceneMood && <Scene mood={sceneMood} />}
       <View style={[styles.container, { paddingTop: insets.top + S.sm, paddingBottom: insets.bottom + S.md }]}>
         {step !== 'welcome' && <ProgressHeader progress={progress} onBack={back} />}
         <ScrollView
@@ -422,14 +411,15 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     alignItems: 'center',
     gap: S.sm,
-    backgroundColor: 'rgba(30,26,46,0.55)',
+    backgroundColor: C.card,
+    ...sticker,
     borderRadius: R.lg,
     padding: S.lg,
   },
-  shockSmall: { fontFamily: F.semibold, fontSize: 17, color: '#FFFFFF', textAlign: 'center' },
+  shockSmall: { fontFamily: F.medium, fontSize: 17, color: C.ink, textAlign: 'center', lineHeight: 24 },
   dreamBanner: {
     alignItems: 'center',
-    backgroundColor: C.sand,
+    backgroundColor: C.accentSoft,
     borderRadius: R.lg,
     borderWidth: 3,
     borderColor: C.ink,
@@ -441,7 +431,7 @@ const styles = StyleSheet.create({
   rowLabel: { fontFamily: F.semibold, fontSize: 16, color: C.ink, flexShrink: 1 },
   segment: { flexDirection: 'row', backgroundColor: C.cardAlt, borderRadius: R.pill, padding: 3 },
   segItem: { paddingVertical: 6, paddingHorizontal: 16, borderRadius: R.pill },
-  segActive: { backgroundColor: C.sand },
+  segActive: { backgroundColor: C.card, ...sticker },
   segText: { fontFamily: F.bold, color: C.ink },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   stepBtn: {
