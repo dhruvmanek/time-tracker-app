@@ -15,6 +15,8 @@ export type RewardParams = {
   /** Id of a world unlocked by this check-in, if any. */
   newWorld: string;
   date: string;
+  /** First hour logged; with `hours`, the range a detail chip applies to. */
+  start: string;
 };
 
 export function recordLog(
@@ -35,6 +37,7 @@ export function recordLog(
   return {
     categoryId,
     hours: String(end - start),
+    start: String(start),
     xp: String(Math.max(0, xpAfter - xpBefore)),
     levelUp: levelAfter > levelBefore ? String(levelAfter) : '',
     newWorld: WORLDS.find((w) => unlockedWorlds(after).includes(w.id) && !worldsBefore.includes(w.id))?.id ?? '',

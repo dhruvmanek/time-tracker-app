@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Small, Title } from '@/components/ui';
@@ -24,8 +24,6 @@ export default function CheckInScreen() {
   const date = params.date ?? dateKey();
   const end = params.end ? Number(params.end) : fallback.end;
   const [start, setStart] = useState(params.start ? Number(params.start) : fallback.start);
-  const [note, setNote] = useState('');
-  const [noteOpen, setNoteOpen] = useState(false);
 
   const day = state.logs[date] ?? {};
   const existing = end - start === 1 ? day[start] : undefined;
@@ -36,9 +34,9 @@ export default function CheckInScreen() {
   const usuals = usualIds.map(getCategory);
   const others = CATEGORIES.filter((c) => !usualIds.includes(c.id));
 
-  const log = (categoryId: string) => {
+  const log = (categoryId: string, detail?: string) => {
     if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const result = recordLog(date, start, end, categoryId, note);
+    const result = recordLog(date, start, end, categoryId, detail);
     router.replace({ pathname: '/reward', params: result });
   };
 
@@ -73,28 +71,13 @@ export default function CheckInScreen() {
         ))}
       </View>
 
-      <View style={styles.extras}>
-        {previous && (
-          <Pressable style={styles.extra} onPress={() => log(previous.categoryId)}>
-            <Text style={styles.extraText} numberOfLines={1}>
-              ⏪ Same as before ({getCategory(previous.categoryId).emoji})
-            </Text>
-          </Pressable>
-        )}
-        <Pressable style={styles.extra} onPress={() => setNoteOpen((o) => !o)}>
-          <Text style={styles.extraText}>✏️ {noteOpen ? 'Hide note' : 'Add a note'}</Text>
+      {previous && (
+        <Pressable style={styles.extra} onPress={() => log(previous.categoryId, previous.note)}>
+          <Text style={styles.extraText} numberOfLines={1}>
+            ⏪ Same as before: {getCategory(previous.categoryId).emoji} {getCategory(previous.categoryId).name}
+            {previous.note ? ` · ${previous.note}` : ''}
+          </Text>
         </Pressable>
-      </View>
-
-      {noteOpen && (
-        <TextInput
-          autoFocus
-          value={note}
-          onChangeText={setNote}
-          placeholder="e.g. “YouTube rabbit hole”. Then tap an activity."
-          placeholderTextColor={C.sub}
-          style={styles.input}
-        />
       )}
 
       {existing && (
@@ -191,9 +174,8 @@ const styles = StyleSheet.create({
     ...sticker,
   },
   tileText: { fontFamily: F.semibold, fontSize: 13, color: C.ink, textAlign: 'center' },
-  extras: { flexDirection: 'row', gap: S.sm, marginTop: S.xs },
   extra: {
-    flex: 1,
+    marginTop: S.xs,
     backgroundColor: C.card,
     borderRadius: R.md,
     paddingVertical: 12,
@@ -202,15 +184,4 @@ const styles = StyleSheet.create({
     borderColor: C.faint,
   },
   extraText: { fontFamily: F.semibold, fontSize: 14, color: C.ink },
-  input: {
-    backgroundColor: C.card,
-    borderRadius: R.md,
-    paddingHorizontal: S.md,
-    paddingVertical: 13,
-    fontSize: 16,
-    fontFamily: F.medium,
-    color: C.ink,
-    borderWidth: 2,
-    borderColor: C.ink,
-  },
 });

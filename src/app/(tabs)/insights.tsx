@@ -7,7 +7,7 @@ import { Body, Card, Heading, Small, Title } from '@/components/ui';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
-import { drainByHour, summarize } from '@/lib/stats';
+import { drainByHour, summarize, topDetail } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
 import { addDays, dateKey, formatRange, shortWeekday } from '@/lib/time';
 
@@ -22,6 +22,7 @@ export default function InsightsScreen() {
   const dates = Array.from({ length: dayCount }, (_, i) => addDays(now, -i));
   const summary = summarize(dates.map((d) => state.logs[dateKey(d)]));
   const sink = summary.byCategory.find(({ id }) => getCategory(id).kind === 'drain');
+  const sinkDetail = sink ? topDetail(dates.map((d) => state.logs[dateKey(d)]), sink.id) : null;
   const focusPct = summary.focusRatio === null ? null : Math.round(summary.focusRatio * 100);
 
   return (
@@ -68,6 +69,11 @@ export default function InsightsScreen() {
                 <Small>
                   That’s {Math.round((sink.hours / summary.logged) * 100)}% of your logged time.
                 </Small>
+                {sinkDetail && (
+                  <Small style={{ color: C.ink }}>
+                    Mostly {sinkDetail.note} ({sinkDetail.hours}h)
+                  </Small>
+                )}
               </View>
             </Card>
           )}

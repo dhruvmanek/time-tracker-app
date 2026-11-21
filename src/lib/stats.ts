@@ -217,3 +217,34 @@ export function recentActivity(state: AppState, now = new Date()): string | unde
   }
   return undefined;
 }
+
+/** Details you've used before for this activity, most recent first. */
+export function pastDetails(state: AppState, categoryId: string, limit = 6): string[] {
+  const seen: { note: string; at: number }[] = [];
+  for (const day of Object.values(state.logs)) {
+    for (const log of Object.values(day)) {
+      if (log.categoryId === categoryId && log.note) seen.push({ note: log.note, at: log.loggedAt });
+    }
+  }
+  seen.sort((a, b) => b.at - a.at);
+  const out: string[] = [];
+  for (const { note } of seen) {
+    if (!out.some((n) => n.toLowerCase() === note.toLowerCase())) out.push(note);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/** The most common detail for an activity over some days, e.g. "Instagram" with 3 hours. */
+export function topDetail(days: (DayLog | undefined)[], categoryId: string): { note: string; hours: number } | null {
+  const counts = new Map<string, number>();
+  for (const day of days) {
+    if (!day) continue;
+    for (const log of Object.values(day)) {
+      if (log.categoryId === categoryId && log.note) counts.set(log.note, (counts.get(log.note) ?? 0) + 1);
+    }
+  }
+  let best: { note: string; hours: number } | null = null;
+  for (const [note, hours] of counts) if (!best || hours > best.hours) best = { note, hours };
+  return best;
+}

@@ -49,3 +49,19 @@ export const CATEGORY_PROPS: Record<string, PropId> = {
   tv: 'gamepad',
   procrastinate: 'swirl',
 };
+
+/** The optional one-tap follow-up shown after logging each activity. */
+export const DETAIL_PROMPTS: Record<string, { question: string; chips: string[] }> = {
+  work: { question: 'What were you working on?', chips: [] },
+  learn: { question: 'How were you learning?', chips: ['Reading', 'Course', 'Podcast', 'Practice'] },
+  exercise: { question: 'What kind?', chips: ['Gym', 'Walk', 'Run', 'Yoga', 'Sport'] },
+  mindful: { question: 'What did you do?', chips: ['Meditation', 'Journaling', 'Nap', 'Self-care'] },
+  chores: { question: 'What was it?', chips: ['Cleaning', 'Laundry', 'Cooking', 'Groceries', 'Errands'] },
+  social: { question: 'Who with?', chips: ['Family', 'Friends', 'Partner', 'Phone call'] },
+  meals: { question: 'What was it?', chips: ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Break'] },
+  commute: { question: 'How did you travel?', chips: ['Car', 'Bus', 'Train', 'Walk', 'Bike'] },
+  meetings: { question: 'What kind?', chips: ['Meeting', 'Email', 'Calls', 'Admin'] },
+  scroll: { question: 'Which app?', chips: ['Instagram', 'YouTube', 'X', 'Reddit', 'WhatsApp', 'Snapchat'] },
+  tv: { question: 'What was it?', chips: ['Netflix', 'YouTube', 'Gaming', 'Prime Video'] },
+  procrastinate: { question: 'What pulled you away?', chips: ['Overthinking', 'Phone', 'Daydreaming', 'Snacking'] },
+};

@@ -147,6 +147,22 @@ export function logHours(
   });
 }
 
+/** Attach (or clear) a short detail, e.g. "Instagram", to already-logged hours. */
+export function setDetail(date: string, start: number, end: number, detail: string | undefined) {
+  setState((s) => {
+    const day = { ...(s.logs[date] ?? {}) };
+    for (let h = start; h < end; h++) {
+      const entry = day[h];
+      if (!entry) continue;
+      const next = { ...entry };
+      if (detail?.trim()) next.note = detail.trim();
+      else delete next.note;
+      day[h] = next;
+    }
+    return { ...s, logs: { ...s.logs, [date]: day } };
+  });
+}
+
 export function clearHour(date: string, hour: number) {
   setState((s) => {
     const day = { ...(s.logs[date] ?? {}) };
