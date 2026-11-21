@@ -16,6 +16,7 @@ import { checkInHours, topCategoryIds } from './stats';
 import { dateKey, formatHour } from './time';
 
 const CATEGORY_ID = 'checkin';
+const TRIAL_REMINDER_ID = 'trial-reminder';
 const ACTION_PREFIX = 'log:';
 const OTHER_ACTION = 'other';
 const supported = Platform.OS !== 'web';
@@ -84,7 +85,13 @@ export function rescheduleAll(): Promise<void> {
 
 async function doReschedule() {
   if (!supported) return;
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  // Cancel only the hourly check-ins; keep one-off reminders such as the trial reminder.
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  await Promise.all(
+    scheduled
+      .filter((n) => n.identifier !== TRIAL_REMINDER_ID)
+      .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
+  );
   const { settings } = getState();
   if (!settings.notificationsOn) return;
   const granted = (await Notifications.getPermissionsAsync()).granted;
@@ -167,4 +174,22 @@ export function listenForResponses(onQuickLog: (reward: RewardParams) => void) {
     handleResponse(r, onQuickLog),
   );
   return () => sub.remove();
+}
+
+/** "Your trial ends tomorrow": promised on the paywall, sent one day before the trial ends. */
+export async function scheduleTrialReminder(trialDays: number) {
+  if (!supported || trialDays < 2) return;
+  if (!(await Notifications.getPermissionsAsync()).granted) return;
+  await Notifications.cancelScheduledNotificationAsync(TRIAL_REMINDER_ID).catch(() => {});
+  await Notifications.scheduleNotificationAsync({
+    identifier: TRIAL_REMINDER_ID,
+    content: {
+      title: 'Tikko ⏳',
+      body: 'Your free trial ends tomorrow. You can cancel anytime in Settings → Apple ID → Subscriptions.',
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: (trialDays - 1) * 24 * 60 * 60,
+    },
+  });
 }

@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
 import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -80,6 +81,16 @@ export default function SettingsScreen() {
         </Small>
         <Button label="Send a test notification" variant="light" onPress={sendTestNotification} />
         <Small>Arrives in 5 seconds. Lock your phone, then long-press it to see the quick-log buttons.</Small>
+      </Card>
+
+      <Card style={{ gap: S.sm }}>
+        <Heading>Subscription</Heading>
+        <Small>Tikko Premium is active. You can change or cancel it any time with Apple.</Small>
+        <Button
+          label="Manage subscription"
+          variant="light"
+          onPress={() => WebBrowser.openBrowserAsync('https://apps.apple.com/account/subscriptions')}
+        />
       </Card>
 
       <Card style={{ gap: S.sm }}>

@@ -23,7 +23,7 @@ import { BigNumber, Button, Card } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { requestPermission, rescheduleAll } from '@/lib/notifications';
 import { checkInHours } from '@/lib/stats';
-import { completeOnboarding, updateProfile, updateSettings } from '@/lib/store';
+import { completeOnboarding, getState, updateProfile, updateSettings } from '@/lib/store';
 import { formatHour } from '@/lib/time';
 import type { Mood } from '@/lib/types';
 
@@ -128,7 +128,8 @@ export default function Onboarding() {
     updateSettings({ notificationsOn: granted });
     completeOnboarding();
     await rescheduleAll();
-    router.replace('/');
+    // Subscribers (e.g. replaying the intro) skip the paywall.
+    router.replace(getState().premium ? '/' : '/paywall');
   };
 
   const single = (set: (v: string[]) => void) => (id: string) => set([id]);

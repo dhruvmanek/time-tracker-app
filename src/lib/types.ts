@@ -49,6 +49,8 @@ export type Profile = {
 
 export type AppState = {
   onboarded: boolean;
+  /** Has an active subscription or trial (cached from RevenueCat, so it works offline). */
+  premium: boolean;
   profile: Profile;
   settings: Settings;
   /** Logs keyed by local date "YYYY-MM-DD". */

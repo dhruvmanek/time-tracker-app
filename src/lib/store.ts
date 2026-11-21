@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const initialState: AppState = {
   onboarded: false,
+  premium: false,
   profile: {},
   settings: DEFAULT_SETTINGS,
   logs: {},
@@ -182,6 +183,10 @@ export function updateProfile(patch: Partial<Profile>) {
 /** Show the intro again (keeps all logs). */
 export function replayOnboarding() {
   setState((s) => ({ ...s, onboarded: false }));
+}
+
+export function setPremium(premium: boolean) {
+  if (state.premium !== premium) setState((s) => ({ ...s, premium }));
 }
 
 export function completeOnboarding() {

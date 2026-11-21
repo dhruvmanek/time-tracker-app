@@ -14,6 +14,7 @@ import { View } from 'react-native';
 
 import { C } from '@/constants/theme';
 import { listenForResponses, rescheduleAll } from '@/lib/notifications';
+import { initPurchases } from '@/lib/purchases';
 import { useAppState, useHydrated } from '@/lib/store';
 
 SplashScreen.preventAutoHideAsync();
@@ -31,7 +32,7 @@ export default function RootLayout() {
     Fredoka_700Bold,
   });
   const ready = hydrated && (fontsLoaded || !!fontError);
-  const { onboarded } = useAppState();
+  const { onboarded, premium } = useAppState();
   const segments = useSegments();
 
   useEffect(() => {
@@ -39,8 +40,15 @@ export default function RootLayout() {
     SplashScreen.hideAsync();
     if (!onboarded && segments[0] !== 'onboarding') {
       router.replace('/onboarding');
+    } else if (onboarded && !premium && segments[0] !== 'paywall') {
+      // Hard paywall: after onboarding, the app needs an active trial or subscription.
+      router.replace('/paywall');
     }
-  }, [ready, onboarded, segments]);
+  }, [ready, onboarded, premium, segments]);
+
+  useEffect(() => {
+    if (hydrated) initPurchases();
+  }, [hydrated]);
 
   // Refresh scheduled check-ins (and their quick buttons) each launch.
   useEffect(() => {
@@ -64,6 +72,7 @@ export default function RootLayout() {
           options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }}
         />
         <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="paywall" options={{ gestureEnabled: false, animation: 'fade' }} />
       </Stack>
     </View>
   );
