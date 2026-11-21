@@ -12,9 +12,9 @@ import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
-import { CATEGORY_PROPS, getCategory } from '@/lib/categories';
+import { getCategory } from '@/lib/categories';
 import { onCelebrate } from '@/lib/celebrate';
-import { energyFor, moodForEnergy, pendingRange, recentActivity, streak, summarize } from '@/lib/stats';
+import { energyFor, moodForEnergy, pendingRange, streak, summarize } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
 import { dateKey, formatHour, formatRange } from '@/lib/time';
 import type { DayLog, Mood } from '@/lib/types';
@@ -41,19 +41,17 @@ export default function HomeScreen() {
   const pending = pendingRange(state, now);
   const hour = now.getHours();
   const asleep = !pending && (hour >= dayEnd || hour < dayStart);
-  const recent = recentActivity(state, now);
   const days = streak(state, now);
   const due = Math.max(0, Math.min(hour, dayEnd) - dayStart);
 
   const question = pending
     ? `What did you do from ${formatRange(pending.start, pending.end).replace('–', ' to ')}?`
     : asleep
-      ? 'Zzz… see you in the morning.'
+      ? 'That’s a wrap for today. See you in the morning!'
       : summaryLine(summary.logged, summary.focus, summary.drain, mood);
 
   const poke = () => {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setBounce((n) => n + 1);
     const lines = TAP_LINES[mood];
     setSaid(lines[Math.floor(Math.random() * lines.length)]);
   };
@@ -86,11 +84,10 @@ export default function HomeScreen() {
       </View>
 
       <Pressable onPress={poke} style={styles.tikko} accessibilityRole="button" accessibilityLabel="Tap Tikko">
+        {/* Home shows just 3 moods: happy, tired, drained. Tap and Tikko waves. */}
         <Tikko
-          mood={mood}
-          prop={recent && !said ? CATEGORY_PROPS[recent] : undefined}
-          pose={said ? 'cheer' : 'idle'}
-          sleeping={asleep && !said}
+          mood={homeMood(mood)}
+          pose={said ? 'wave' : 'idle'}
           size={Math.min(250, width * 0.62)}
           bounceKey={bounce}
         />
@@ -165,6 +162,11 @@ function Legend({ color, label }: { color: string; label: string }) {
   );
 }
 
+/** Collapse the four internal moods into the three Home shows. */
+function homeMood(m: Mood): Mood {
+  return m === 'radiant' ? 'happy' : m;
+}
+
 function greeting(h: number) {
   if (h < 5) return 'Still up?';
   if (h < 12) return 'Good morning';
@@ -179,11 +181,12 @@ function summaryLine(logged: number, focus: number, drain: number, mood: Mood) {
   return `All caught up. ${logged}h logged so far.`;
 }
 
+// Tikko waves when tapped, so every line is a greeting.
 const TAP_LINES: Record<Mood, string[]> = {
-  radiant: ['Ding ding! 🔔', 'Best day ever!', 'Keep it going!'],
-  happy: ['Hehe, that tickles!', 'Tick tock!', 'One hour at a time.'],
-  meh: ['Running a bit slow…', 'Wind me up a little?', 'A focused hour would help.'],
-  drained: ['So… much… scrolling…', 'My battery is low 🪫', 'Help me recharge?'],
+  radiant: ['Hi there! 👋', 'Hey! Great day so far!'],
+  happy: ['Hi there! 👋', 'Hey! One hour at a time.'],
+  meh: ['Hi! Hanging in there?', 'Hey! A focused hour would help.'],
+  drained: ['Hi… rough day, huh?', 'Hey! Let’s win back the next hour.'],
 };
 
 /** Re-render every minute so the pending check-in stays current. */

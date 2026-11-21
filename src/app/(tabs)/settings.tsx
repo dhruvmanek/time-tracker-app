@@ -94,7 +94,7 @@ export default function SettingsScreen() {
               resetAll();
               return;
             }
-            Alert.alert('Erase everything?', 'All check-ins, XP and streaks will be deleted.', [
+            Alert.alert('Erase everything?', 'All check-ins and streaks will be deleted.', [
               { text: 'Cancel', style: 'cancel' },
               { text: 'Erase', style: 'destructive', onPress: resetAll },
             ]);

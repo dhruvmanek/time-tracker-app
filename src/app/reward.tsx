@@ -1,11 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Tikko } from '@/components/tikko';
-import { BigNumber, Button } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
 import { CATEGORY_PROPS, getCategory } from '@/lib/categories';
 import { celebrate } from '@/lib/celebrate';
@@ -72,27 +72,17 @@ export default function RewardScreen() {
         ))}
       </View>
 
-      <Animated.View entering={ZoomIn.springify().damping(9)}>
-        <BigNumber value={`+${p.xp ?? 0}`} suffix=" XP" size={76} />
-      </Animated.View>
+      <View style={styles.middle}>
+        <Tikko mood="radiant" prop={CATEGORY_PROPS[cat.id]} size={240} bounceKey={bounce} />
 
-      {p.levelUp ? (
-        <Animated.View entering={FadeInDown.delay(300)} style={styles.levelUp}>
-          <Text style={styles.levelUpText}>⭐ Level up! You’re now level {p.levelUp}</Text>
-        </Animated.View>
-      ) : null}
-
-      <View style={{ alignItems: 'center' }}>
-        <Tikko mood="radiant" act={p.levelUp ? 'crown' : undefined} prop={CATEGORY_PROPS[cat.id]} size={230} bounceKey={bounce} />
-      </View>
-
-      <Animated.View entering={FadeInDown.delay(150)} style={{ alignItems: 'center', gap: S.sm }}>
+        <Animated.View entering={FadeInDown.delay(150)} style={{ alignItems: 'center', gap: S.sm }}>
         <Text style={styles.title}>Ding! {hours === 1 ? 'Hour' : `${hours} hours`} logged</Text>
         <Text style={styles.cat}>
           {cat.emoji} {cat.name}
         </Text>
         <Text style={styles.streak}>{streakLine}</Text>
-      </Animated.View>
+        </Animated.View>
+      </View>
 
       <Button label="Nice!" onPress={done} style={{ alignSelf: 'stretch' }} />
     </View>
@@ -104,6 +94,5 @@ const styles = StyleSheet.create({
   title: { fontFamily: F.display, fontSize: 32, color: C.ink, textAlign: 'center' },
   cat: { fontFamily: F.bold, fontSize: 18, color: C.ink },
   streak: { fontFamily: F.medium, fontSize: 16, color: C.sub, textAlign: 'center', paddingHorizontal: S.md },
-  levelUp: { backgroundColor: C.ink, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 8 },
-  levelUpText: { fontFamily: F.bold, color: '#FFFFFF', fontSize: 15 },
+  middle: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: S.lg },
 });

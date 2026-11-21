@@ -131,7 +131,7 @@ type Props = {
   /** Level stage. Reserved for crown/badge artwork; not shown yet. */
   stage?: 1 | 2 | 3;
   size?: number;
-  /** Increment to make Tikko jump and ring (e.g. after a check-in or a tap). */
+  /** Increment to make Tikko do one small hop (e.g. after a check-in). */
   bounceKey?: number;
 };
 
@@ -139,46 +139,35 @@ export function Tikko({ mood, pose = 'idle', prop, act, sleeping = false, size =
   const art = pickImage(mood, pose, prop, sleeping, act);
   const wide = art.wide ?? 1;
   const breathe = useSharedValue(0);
-  const sway = useSharedValue(0);
   const jump = useSharedValue(0);
-  const shake = useSharedValue(0);
 
-  // Breathing: slower and heavier when tired or asleep.
+  // Breathing: the body gently swells and settles from its feet. No movement
+  // up or down, so it reads as breathing rather than bouncing. Slower when tired.
   useEffect(() => {
     const slow = sleeping || mood === 'drained' || mood === 'meh';
     breathe.value = withRepeat(
-      withTiming(1, { duration: slow ? 2600 : 1500, easing: Easing.inOut(Easing.sin) }),
+      withTiming(1, { duration: slow ? 3400 : 2600, easing: Easing.inOut(Easing.sin) }),
       -1,
       true,
     );
-    sway.value = withRepeat(withTiming(1, { duration: 3200, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, [breathe, sway, mood, sleeping]);
+  }, [breathe, mood, sleeping]);
 
-  // Tap / check-in: squash, jump, and a quick ringing wiggle.
+  // After a check-in: one small, soft hop. No shaking.
   useEffect(() => {
     if (bounceKey === 0) return;
     jump.value = withSequence(
-      withTiming(1, { duration: 90 }),
-      withTiming(-34, { duration: 180, easing: Easing.out(Easing.quad) }),
-      withTiming(0, { duration: 340, easing: Easing.bounce }),
+      withTiming(-14, { duration: 220, easing: Easing.out(Easing.quad) }),
+      withTiming(0, { duration: 260, easing: Easing.in(Easing.quad) }),
     );
-    shake.value = withSequence(
-      ...Array.from({ length: 10 }, (_, i) => withTiming(i % 2 ? -6 : 6, { duration: 40 })),
-      withTiming(0, { duration: 60 }),
-    );
-  }, [jump, shake, bounceKey]);
+  }, [jump, bounceKey]);
 
-  const bodyStyle = useAnimatedStyle(() => {
-    const squash = jump.value > 0 ? jump.value * 0.08 : 0; // little crouch before the jump
-    return {
-      transform: [
-        { translateY: Math.min(jump.value, 0) + breathe.value * -3 },
-        { rotate: `${shake.value + (sway.value - 0.5) * 2.4}deg` },
-        { scaleY: 1 + breathe.value * 0.025 - squash },
-        { scaleX: 1 - breathe.value * 0.01 + squash },
-      ],
-    };
-  });
+  const bodyStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: jump.value },
+      { scaleY: 1 + breathe.value * 0.018 },
+      { scaleX: 1 + breathe.value * 0.008 },
+    ],
+  }));
   const shadowStyle = useAnimatedStyle(() => ({
     transform: [{ scaleX: 1 + Math.min(jump.value, 0) / 90 }],
     opacity: 0.07 + Math.min(jump.value, 0) / 800,

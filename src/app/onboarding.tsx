@@ -144,7 +144,7 @@ export default function Onboarding() {
     case 'welcome':
       body = (
         <View style={styles.center}>
-          <Tikko mood="happy" pose="wave" size={230} bounceKey={1} />
+          <Tikko mood="happy" pose="wave" size={230} />
           <Card style={styles.welcomeCard}>
             <Typewriter text="Hi, I’m Tikko!" style={styles.bigTitle} delay={300} />
             <Typewriter
@@ -270,7 +270,7 @@ export default function Onboarding() {
         <Question title="Logging takes 2 seconds" subtitle="When Tikko rings, press and hold the notification, then tap what you did." act="notify">
           <NotificationPreview />
           <Text style={[styles.lead, { marginTop: S.md }]}>
-            Every honest answer earns XP, even the scrolling ones. At night you’ll see exactly where your day went.
+            Be honest, even about the scrolling. At night you’ll see exactly where your day went.
           </Text>
         </Question>
       );
@@ -297,7 +297,7 @@ export default function Onboarding() {
     case 'notify':
       body = (
         <View style={styles.center}>
-          <Tikko mood="radiant" act="party" size={200} bounceKey={1} />
+          <Tikko mood="radiant" act="party" size={200} />
           <Card style={styles.welcomeCard}>
             <Typewriter text="Let Tikko ring" style={[styles.bigTitle, { fontSize: 30 }]} />
             <Typewriter
@@ -357,7 +357,7 @@ function Question({
   return (
     <View style={{ gap: S.md }}>
       <View style={{ alignItems: 'center', marginBottom: -S.sm }}>
-        <Tikko mood={mood} act={act} size={130} bounceKey={1} />
+        <Tikko mood={mood} act={act} size={130} />
       </View>
       <View style={{ gap: 6 }}>
         <Typewriter text={title} style={styles.qTitle} onDone={subtitle ? undefined : () => setTyped(true)} />
@@ -405,8 +405,8 @@ const styles = StyleSheet.create({
   welcomeCard: { alignSelf: 'stretch', alignItems: 'center', gap: S.sm, paddingVertical: S.lg },
   bigTitle: { fontFamily: F.display, fontSize: 34, color: C.ink, textAlign: 'center' },
   lead: { fontFamily: F.medium, fontSize: 16.5, color: C.ink, textAlign: 'center', lineHeight: 23 },
-  qTitle: { fontFamily: F.display, fontSize: 30, color: C.ink, lineHeight: 34 },
-  qSub: { fontFamily: F.medium, fontSize: 15.5, color: C.sub },
+  qTitle: { fontFamily: F.display, fontSize: 28, color: C.ink, lineHeight: 33, textAlign: 'center' },
+  qSub: { fontFamily: F.medium, fontSize: 15.5, color: C.sub, textAlign: 'center' },
   shockCard: {
     alignSelf: 'stretch',
     alignItems: 'center',

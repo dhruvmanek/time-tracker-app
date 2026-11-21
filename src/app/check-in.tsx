@@ -107,7 +107,7 @@ export default function CheckInScreen() {
           <Text style={[styles.extraText, { color: C.drain }]}>Clear {formatHour(start)}</Text>
         </Pressable>
       )}
-      <Small style={{ textAlign: 'center' }}>Every honest check-in earns XP, even the scrolling ones.</Small>
+      <Small style={{ textAlign: 'center' }}>Every honest check-in counts, even the scrolling ones.</Small>
     </ScrollView>
   );
 }
