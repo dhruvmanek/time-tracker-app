@@ -36,8 +36,12 @@ export function Timeline({ day, dayStart, dayEnd, currentHour, onPressHour }: Pr
               <View style={[styles.block, { backgroundColor: cat.color + '26', borderColor: cat.color }]}>
                 <Text style={styles.blockText} numberOfLines={1}>
                   {cat.emoji} {cat.name}
-                  {log?.note ? <Text style={styles.note}>  · {log.note}</Text> : null}
                 </Text>
+                {log?.note ? (
+                  <Text style={styles.note} numberOfLines={2}>
+                    {log.note}
+                  </Text>
+                ) : null}
               </View>
             ) : future ? (
               <View style={[styles.block, styles.future]} />
@@ -62,10 +66,11 @@ const styles = StyleSheet.create({
     borderRadius: R.sm,
     borderLeftWidth: 5,
     paddingHorizontal: S.sm,
+    paddingVertical: 7,
     justifyContent: 'center',
   },
   blockText: { fontSize: 14.5, fontFamily: F.semibold, color: C.ink },
-  note: { fontFamily: F.regular, color: C.sub },
+  note: { fontFamily: F.regular, fontSize: 13.5, color: C.sub, marginTop: 1 },
   empty: { borderColor: C.faint, borderStyle: 'dashed', borderWidth: 1.5, borderLeftWidth: 1.5 },
   emptyText: { fontSize: 13, fontFamily: F.medium, color: C.sub },
   future: { backgroundColor: C.cardAlt, borderColor: 'transparent', opacity: 0.5 },

@@ -78,7 +78,9 @@ export default function HomeScreen() {
 
       <View style={styles.bubbleWrap}>
         <Animated.View key={said ?? question} entering={FadeIn.duration(200)} style={styles.bubble}>
-          <Text style={styles.bubbleText}>{said ?? question}</Text>
+          <Text style={styles.bubbleText} numberOfLines={2}>
+            {said ?? question}
+          </Text>
           <View style={styles.bubbleTail} />
         </Animated.View>
       </View>
@@ -206,7 +208,8 @@ const styles = StyleSheet.create({
   greeting: { fontFamily: F.display, fontSize: 27, color: C.ink, marginTop: 2 },
   streak: { ...sticker, backgroundColor: C.card, borderRadius: R.pill, paddingVertical: 6, paddingHorizontal: 12 },
   streakText: { fontFamily: F.semibold, fontSize: 14, color: C.ink },
-  bubbleWrap: { alignItems: 'center', marginTop: S.md },
+  // Fixed height (room for 2 lines) so a longer line never pushes Tikko and the cards down.
+  bubbleWrap: { alignItems: 'center', justifyContent: 'flex-end', height: 76, marginTop: S.sm },
   bubble: {
     ...sticker,
     backgroundColor: C.card,

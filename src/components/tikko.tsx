@@ -69,8 +69,8 @@ type PoseArt = { src: number; wide?: number };
 
 const POSE_IMAGES: Partial<Record<PoseImage, PoseArt>> = {
   wave: { src: require('@/assets/mascot/wave.png') },
-  'wave-tired': { src: require('@/assets/mascot/wave-tired.png'), wide: 1.01 },
-  'wave-drained': { src: require('@/assets/mascot/wave-drained.png'), wide: 1.02 },
+  'wave-tired': { src: require('@/assets/mascot/wave-tired.png') },
+  'wave-drained': { src: require('@/assets/mascot/wave-drained.png') },
   cheer: { src: require('@/assets/mascot/cheer.png') },
   tired: { src: require('@/assets/mascot/tired.png') },
   drained: { src: require('@/assets/mascot/drained.png') },
