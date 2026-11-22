@@ -17,6 +17,7 @@ import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { CATEGORY_PROPS, DETAIL_PROMPTS, getCategory } from '@/lib/categories';
+import { track } from '@/lib/analytics';
 import { celebrate } from '@/lib/celebrate';
 import type { RewardParams } from '@/lib/log';
 import { STREAK_MIN_HOURS, streak } from '@/lib/stats';
@@ -57,7 +58,10 @@ export default function RewardScreen() {
   const [draft, setDraft] = useState('');
   const canDetail = !!prompt && start >= 0;
   const saveDetail = () => {
-    if (canDetail && draft.trim()) setDetail(date, start, start + hours, draft);
+    if (canDetail && draft.trim()) {
+      setDetail(date, start, start + hours, draft);
+      track('checkin_detail_added', { category: cat.id });
+    }
   };
 
   let streakLine: string;

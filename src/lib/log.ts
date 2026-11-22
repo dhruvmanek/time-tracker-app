@@ -3,6 +3,8 @@
 
 import { WORLDS } from '@/components/scene';
 
+import { track } from './analytics';
+import { getCategory } from './categories';
 import { levelInfo, totalXp, unlockedWorlds } from './stats';
 import { getState, logHours } from './store';
 
@@ -25,11 +27,19 @@ export function recordLog(
   end: number,
   categoryId: string,
   note?: string,
+  source: 'app' | 'notification' | 'same_as_before' = 'app',
 ): RewardParams {
   const before = getState();
   const xpBefore = totalXp(before);
   const worldsBefore = unlockedWorlds(before);
   logHours(date, start, end, categoryId, note);
+  track('checkin_logged', {
+    category: categoryId,
+    kind: getCategory(categoryId).kind,
+    hours: end - start,
+    source,
+    has_detail: !!note,
+  });
   const after = getState();
   const xpAfter = totalXp(after);
   const levelBefore = levelInfo(xpBefore).level;

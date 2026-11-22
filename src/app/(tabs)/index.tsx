@@ -13,6 +13,7 @@ import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
+import { track } from '@/lib/analytics';
 import { onCelebrate } from '@/lib/celebrate';
 import { energyFor, moodForEnergy, pendingRange, streak, summarize } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
@@ -52,8 +53,9 @@ export default function HomeScreen() {
 
   const poke = () => {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    track('mascot_tapped', { mood: homeMood(mood) });
     const lines = TAP_LINES[mood];
-    setSaid(lines[Math.floor(Math.random() * lines.length)]);
+    setSaid(pickOne(lines));
   };
 
   return (
@@ -162,6 +164,10 @@ function Legend({ color, label }: { color: string; label: string }) {
       <Text style={styles.legendText}>{label}</Text>
     </View>
   );
+}
+
+function pickOne<T>(items: T[]): T {
+  return items[Math.floor(Math.random() * items.length)];
 }
 
 /** Collapse the four internal moods into the three Home shows. */

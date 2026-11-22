@@ -34,9 +34,9 @@ export default function CheckInScreen() {
   const usuals = usualIds.map(getCategory);
   const others = CATEGORIES.filter((c) => !usualIds.includes(c.id));
 
-  const log = (categoryId: string, detail?: string) => {
+  const log = (categoryId: string, detail?: string, source: 'app' | 'same_as_before' = 'app') => {
     if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const result = recordLog(date, start, end, categoryId, detail);
+    const result = recordLog(date, start, end, categoryId, detail, source);
     router.replace({ pathname: '/reward', params: result });
   };
 
@@ -72,7 +72,7 @@ export default function CheckInScreen() {
       </View>
 
       {previous && (
-        <Pressable style={styles.extra} onPress={() => log(previous.categoryId, previous.note)}>
+        <Pressable style={styles.extra} onPress={() => log(previous.categoryId, previous.note, 'same_as_before')}>
           <Text style={styles.extraText} numberOfLines={1}>
             ⏪ Same as before: {getCategory(previous.categoryId).emoji} {getCategory(previous.categoryId).name}
             {previous.note ? ` · ${previous.note}` : ''}

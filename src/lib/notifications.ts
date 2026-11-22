@@ -10,6 +10,7 @@ import { router } from 'expo-router';
 import { Platform } from 'react-native';
 
 import { DEFAULT_QUICK_IDS, getCategory } from './categories';
+import { track } from './analytics';
 import { recordLog, type RewardParams } from './log';
 import { getState, markResponseHandled, ready } from './store';
 import { checkInHours, topCategoryIds } from './stats';
@@ -155,8 +156,10 @@ async function handleResponse(
 
   if (actionIdentifier.startsWith(ACTION_PREFIX)) {
     const categoryId = actionIdentifier.slice(ACTION_PREFIX.length);
-    onQuickLog(recordLog(date, data.start, data.end, categoryId));
+    track('notification_opened', { action: 'quick_log' });
+    onQuickLog(recordLog(date, data.start, data.end, categoryId, undefined, 'notification'));
   } else {
+    track('notification_opened', { action: actionIdentifier === OTHER_ACTION ? 'something_else' : 'open' });
     router.push({
       pathname: '/check-in',
       params: { date, start: String(data.start), end: String(data.end) },

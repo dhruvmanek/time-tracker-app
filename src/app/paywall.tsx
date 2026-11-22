@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
+import { track } from '@/lib/analytics';
 import { scheduleTrialReminder } from '@/lib/notifications';
 import { buy, loadPlans, restore, storeReady, type Plan } from '@/lib/purchases';
 
@@ -25,6 +26,7 @@ export default function Paywall() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    track('paywall_viewed');
     loadPlans().then(setPlans);
   }, []);
 
@@ -41,6 +43,9 @@ export default function Paywall() {
     setBusy(true);
     const result = await buy(plan);
     setBusy(false);
+    const props = { plan: plan.id, price: plan.price, trial_days: plan.trialDays };
+    if (result === 'success') track(plan.trialDays > 0 ? 'trial_started' : 'subscribed', props);
+    else track(result === 'cancelled' ? 'purchase_cancelled' : 'purchase_failed', props);
     if (result === 'success') {
       if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (plan.trialDays > 0) scheduleTrialReminder(plan.trialDays);
@@ -51,6 +56,7 @@ export default function Paywall() {
   };
 
   const onRestore = async () => {
+    track('restore_tapped');
     setBusy(true);
     const ok = await restore();
     setBusy(false);
@@ -99,7 +105,10 @@ export default function Paywall() {
             {annual && (
               <PlanRow
                 selected={selected === 'annual'}
-                onPress={() => setSelected('annual')}
+                onPress={() => {
+                  setSelected('annual');
+                  track('paywall_plan_selected', { plan: 'annual' });
+                }}
                 name="Yearly"
                 meta={annual.perMonth ? `${annual.perMonth} / month` : 'Billed yearly'}
                 price={annual.price}
@@ -112,7 +121,10 @@ export default function Paywall() {
             {monthly && (
               <PlanRow
                 selected={selected === 'monthly'}
-                onPress={() => setSelected('monthly')}
+                onPress={() => {
+                  setSelected('monthly');
+                  track('paywall_plan_selected', { plan: 'monthly' });
+                }}
                 name="Monthly"
                 meta="Billed monthly"
                 price={monthly.price}

@@ -21,6 +21,7 @@ import { Tikko, type Act } from '@/components/tikko';
 import { Typewriter } from '@/components/typewriter';
 import { BigNumber, Button, Card } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
+import { track } from '@/lib/analytics';
 import { requestPermission, rescheduleAll } from '@/lib/notifications';
 import { checkInHours } from '@/lib/stats';
 import { completeOnboarding, getState, updateProfile, updateSettings } from '@/lib/store';
@@ -81,6 +82,9 @@ export default function Onboarding() {
   const insets = useSafeAreaInsets();
   const [i, setI] = useState(0);
   const step = STEPS[i];
+  useEffect(() => {
+    track('onboarding_step_viewed', { step, index: i });
+  }, [step, i]);
 
   // Answers
   const [goal, setGoal] = useState<string[]>([]);
@@ -126,6 +130,15 @@ export default function Onboarding() {
     updateSettings({ dayStart, dayEnd, interval });
     const granted = askPermission ? await requestPermission() : false;
     updateSettings({ notificationsOn: granted });
+    track('onboarding_completed', {
+      goal: goal[0],
+      persona: persona[0],
+      age_group: age[0],
+      hours_lost: hours,
+      dream: dream[0],
+      sinks: sinks.join(','),
+      notifications: granted,
+    });
     completeOnboarding();
     await rescheduleAll();
     // Subscribers (e.g. replaying the intro) skip the paywall.

@@ -6,7 +6,7 @@ import {
 } from '@expo-google-fonts/fredoka';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
-import { router, Stack, useSegments } from 'expo-router';
+import { router, Stack, usePathname, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -14,6 +14,7 @@ import { View } from 'react-native';
 
 import { C } from '@/constants/theme';
 import { listenForResponses, rescheduleAll } from '@/lib/notifications';
+import { trackScreen } from '@/lib/analytics';
 import { initPurchases } from '@/lib/purchases';
 import { useAppState, useHydrated } from '@/lib/store';
 
@@ -34,6 +35,10 @@ export default function RootLayout() {
   const ready = hydrated && (fontsLoaded || !!fontError);
   const { onboarded, premium } = useAppState();
   const segments = useSegments();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname) trackScreen(pathname);
+  }, [pathname]);
 
   useEffect(() => {
     if (!ready) return;

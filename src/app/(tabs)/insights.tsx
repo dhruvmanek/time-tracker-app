@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -6,6 +6,7 @@ import { CategoryBars } from '@/components/breakdown';
 import { Body, Card, Heading, Small, Title } from '@/components/ui';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { C, F, R, S, sticker } from '@/constants/theme';
+import { track } from '@/lib/analytics';
 import { getCategory } from '@/lib/categories';
 import { drainByHour, summarize, topDetail } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
@@ -17,6 +18,9 @@ export default function InsightsScreen() {
   const state = useAppState();
   const insets = useSafeAreaInsets();
   const [range, setRange] = useState<Range>('today');
+  useEffect(() => {
+    track('insights_viewed', { range });
+  }, [range]);
   const now = new Date();
   const dayCount = range === 'today' ? 1 : 7;
   const dates = Array.from({ length: dayCount }, (_, i) => addDays(now, -i));

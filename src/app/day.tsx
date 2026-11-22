@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -7,6 +7,7 @@ import { StackedBar } from '@/components/breakdown';
 import { Timeline } from '@/components/timeline';
 import { Card, Heading, Small, Title } from '@/components/ui';
 import { C, F, S } from '@/constants/theme';
+import { track } from '@/lib/analytics';
 import { summarize } from '@/lib/stats';
 import { useAppState } from '@/lib/store';
 import { addDays, dateKey } from '@/lib/time';
@@ -15,6 +16,9 @@ export default function DayScreen() {
   const state = useAppState();
   const insets = useSafeAreaInsets();
   const [offset, setOffset] = useState(0); // 0 = today, -1 = yesterday, ...
+  useEffect(() => {
+    track('day_opened', { days_ago: -offset });
+  }, [offset]);
   const now = new Date();
   const date = addDays(now, offset);
   const key = dateKey(date);

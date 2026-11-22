@@ -13,6 +13,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import Purchases, { type CustomerInfo, type PurchasesPackage } from 'react-native-purchases';
 
+import { analyticsId } from './analytics';
 import { setPremium } from './store';
 
 export const ENTITLEMENT = 'premium';
@@ -48,6 +49,9 @@ export async function initPurchases() {
   if (!storeReady || started) return;
   started = true;
   Purchases.configure({ apiKey: API_KEY });
+  // Link subscriptions to the same anonymous id PostHog uses (RevenueCat → PostHog integration).
+  const id = analyticsId();
+  if (id) Purchases.setAttributes({ $posthogUserId: id });
   Purchases.addCustomerInfoUpdateListener((info) => setPremium(hasPremium(info)));
   try {
     setPremium(hasPremium(await Purchases.getCustomerInfo()));
