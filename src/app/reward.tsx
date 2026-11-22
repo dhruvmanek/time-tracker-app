@@ -18,6 +18,7 @@ import { Button } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { CATEGORY_PROPS, DETAIL_PROMPTS, getCategory } from '@/lib/categories';
 import { track } from '@/lib/analytics';
+import { maybeAskForReview } from '@/lib/review';
 import { celebrate } from '@/lib/celebrate';
 import type { RewardParams } from '@/lib/log';
 import { STREAK_MIN_HOURS, streak } from '@/lib/stats';
@@ -74,6 +75,8 @@ export default function RewardScreen() {
     saveDetail();
     router.back();
     setTimeout(() => celebrate('ring'), 350);
+    // A good moment to ask for a rating: they just logged and are on a streak.
+    setTimeout(() => maybeAskForReview(days), 1200);
   };
 
   return (

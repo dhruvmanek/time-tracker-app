@@ -59,4 +59,5 @@ export type Event =
   | 'mascot_tapped'
   | 'day_opened'
   | 'insights_viewed'
-  | 'notification_opened';
+  | 'notification_opened'
+  | 'review_prompted';

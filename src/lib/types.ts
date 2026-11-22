@@ -51,6 +51,8 @@ export type AppState = {
   onboarded: boolean;
   /** Has an active subscription or trial (cached from RevenueCat, so it works offline). */
   premium: boolean;
+  /** When we last asked for an App Store rating (ms). */
+  reviewAskedAt?: number;
   profile: Profile;
   settings: Settings;
   /** Logs keyed by local date "YYYY-MM-DD". */

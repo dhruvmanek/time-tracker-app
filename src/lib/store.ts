@@ -185,6 +185,10 @@ export function replayOnboarding() {
   setState((s) => ({ ...s, onboarded: false }));
 }
 
+export function markReviewAsked() {
+  setState((s) => ({ ...s, reviewAskedAt: Date.now() }));
+}
+
 export function setPremium(premium: boolean) {
   if (state.premium !== premium) setState((s) => ({ ...s, premium }));
 }

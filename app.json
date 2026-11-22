@@ -8,7 +8,7 @@
     "scheme": "tikk",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.dhruvmanek.tikk",
       "supportsTablet": false,
       "infoPlist": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FAD678",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -34,9 +34,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFF6EA",
+          "backgroundColor": "#FAF8F5",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 180
         }
       ],
       "expo-notifications"
@@ -54,7 +54,9 @@
       "eas": {
         "projectId": "e9c85347-3380-40e4-900d-7ced7e1aa923"
       },
-      "revenuecatIosKey": "appl_aKvOcIqhIKHnDEFoVdpfbxBytNv"
+      "revenuecatIosKey": "appl_aKvOcIqhIKHnDEFoVdpfbxBytNv",
+      "posthogKey": "phc_pJjRRxVZLRPCEwFQRDEBjVwowMtauyWLBH7RHdq8U8DK",
+      "posthogHost": "https://us.i.posthog.com"
     }
   }
 }
