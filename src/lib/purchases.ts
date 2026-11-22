@@ -5,8 +5,9 @@
 // offering whose packages are the yearly ($39.99, 3-day free trial) and monthly
 // ($4.99) subscriptions. Prices then come from Apple, in each user's currency.
 //
-// Until the key is added, the paywall shows the US prices below and "buying"
-// simply unlocks the app, so testing isn't blocked. That fallback must not ship.
+// On iOS the key below makes purchases real (sandbox in TestFlight, real money in
+// the App Store). Without a key (e.g. the web preview) the paywall shows the US
+// prices below and "buying" simply unlocks the app.
 
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
