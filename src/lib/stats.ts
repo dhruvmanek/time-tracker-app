@@ -1,16 +1,11 @@
-// The game rules and the numbers behind the Insights screen.
-// Design rule: XP comes from logging honestly, never from being "productive".
-// Productivity only changes Tikko's mood.
+// The numbers behind Home, Insights and the recap, plus Tikko's mood rules.
+// Streaks reward logging honestly; what you did only changes Tikko's mood.
 
 import { CATEGORIES, getCategory } from './categories';
 import { addDays, dateKey } from './time';
-import { WORLDS, type WorldId } from '@/components/scene';
 
 import type { AppState, DayLog, Mood, Settings } from './types';
 
-export const XP_PER_HOUR = 10;
-/** Bonus for logging within 90 minutes of the hour ending (fresh memory = better data). */
-export const ON_TIME_BONUS = 5;
 /** A day counts toward your streak once you log at least this many hours. */
 export const STREAK_MIN_HOURS = 4;
 
@@ -52,39 +47,6 @@ export function summarize(days: (DayLog | undefined)[]): DaySummary {
   };
 }
 
-function hourXp(date: string, hour: number, loggedAt: number): number {
-  const [y, m, d] = date.split('-').map(Number);
-  const hourEnd = new Date(y, m - 1, d, hour + 1).getTime();
-  const onTime = loggedAt - hourEnd <= 90 * 60 * 1000;
-  return XP_PER_HOUR + (onTime ? ON_TIME_BONUS : 0);
-}
-
-export function totalXp(state: AppState): number {
-  let xp = 0;
-  for (const [date, day] of Object.entries(state.logs)) {
-    for (const [hour, log] of Object.entries(day)) {
-      xp += hourXp(date, Number(hour), log.loggedAt);
-    }
-  }
-  return xp;
-}
-
-/** Level n needs 50·n·(n−1) XP in total: L2 = 100, L3 = 300, L4 = 600, ... */
-export function levelInfo(xp: number) {
-  let level = 1;
-  while (xp >= 50 * (level + 1) * level) level++;
-  const floor = 50 * level * (level - 1);
-  const next = 50 * (level + 1) * level;
-  return { level, xpIntoLevel: xp - floor, xpForLevel: next - floor };
-}
-
-/** Tikko grows as you level up: 1 = sprout, 2 = buddy, 3 = radiant elder. */
-export function stageForLevel(level: number): 1 | 2 | 3 {
-  if (level >= 8) return 3;
-  if (level >= 4) return 2;
-  return 1;
-}
-
 export function streak(state: AppState, today = new Date()): number {
   const qualifies = (d: Date) =>
     Object.keys(state.logs[dateKey(d)] ?? {}).length >= STREAK_MIN_HOURS;
@@ -101,9 +63,9 @@ export function streak(state: AppState, today = new Date()): number {
 /**
  * Tikko's energy for a day, 0–100. Starts at 80 each morning.
  * Focus hours charge it (+6), drain hours run it down (−12), neutral hours do nothing.
- * Energy is only about how the day went. XP (for logging honestly) is separate.
+ * Energy is only about how the day went; streaks (for logging honestly) are separate.
  */
-export const ENERGY_START = 80;
+const ENERGY_START = 80;
 export function energyFor(summary: DaySummary): number {
   const e = ENERGY_START + summary.focus * 6 - summary.drain * 12;
   return Math.max(0, Math.min(100, e));
@@ -115,13 +77,6 @@ export function moodForEnergy(energy: number): Mood {
   if (energy >= 40) return 'meh';
   return 'drained';
 }
-
-export const MOOD_LINES: Record<Mood, string> = {
-  radiant: 'Tikko is ringing with energy!',
-  happy: 'Tikko is ticking along nicely',
-  meh: 'Tikko is slowing down…',
-  drained: 'Tikko is running down…',
-};
 
 /** Hours on the clock when check-ins happen, e.g. [9, 10, ..., 23]. */
 export function checkInHours(settings: Settings): number[] {
@@ -182,57 +137,6 @@ export function drainByHour(state: AppState, days: number, today = new Date()) {
     }
   }
   return result;
-}
-
-/** How many check-in slots of today have already passed (for "6/9 check-ins"). */
-export function hoursDueToday(settings: Settings, now = new Date()): number {
-  const end = Math.min(now.getHours(), settings.dayEnd);
-  return Math.max(0, end - settings.dayStart);
-}
-
-/** Days with at least STREAK_MIN_HOURS logged. Never goes down, so unlocks are kept. */
-export function goodDays(state: AppState): number {
-  return Object.values(state.logs).filter((day) => Object.keys(day).length >= STREAK_MIN_HOURS).length;
-}
-
-export function unlockedWorlds(state: AppState): WorldId[] {
-  const days = goodDays(state);
-  return WORLDS.filter((w) => days >= w.goodDays).map((w) => w.id);
-}
-
-/** The chosen world if it's unlocked, otherwise the newest unlocked one. */
-export function activeWorld(state: AppState): WorldId {
-  const unlocked = unlockedWorlds(state);
-  const chosen = state.settings.world;
-  return chosen && unlocked.includes(chosen) ? chosen : unlocked[unlocked.length - 1];
-}
-
-/** The most recent logged hour of today, if it was within the last 2 hours. */
-export function recentActivity(state: AppState, now = new Date()): string | undefined {
-  const day = state.logs[dateKey(now)];
-  if (!day) return undefined;
-  const h = now.getHours();
-  for (let hour = h - 1; hour >= h - 2; hour--) {
-    if (day[hour]) return day[hour].categoryId;
-  }
-  return undefined;
-}
-
-/** Details you've used before for this activity, most recent first. */
-export function pastDetails(state: AppState, categoryId: string, limit = 6): string[] {
-  const seen: { note: string; at: number }[] = [];
-  for (const day of Object.values(state.logs)) {
-    for (const log of Object.values(day)) {
-      if (log.categoryId === categoryId && log.note) seen.push({ note: log.note, at: log.loggedAt });
-    }
-  }
-  seen.sort((a, b) => b.at - a.at);
-  const out: string[] = [];
-  for (const { note } of seen) {
-    if (!out.some((n) => n.toLowerCase() === note.toLowerCase())) out.push(note);
-    if (out.length >= limit) break;
-  }
-  return out;
 }
 
 /** The most common detail for an activity over some days, e.g. "Instagram" with 3 hours. */

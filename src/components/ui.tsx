@@ -63,19 +63,6 @@ export function Button({
   );
 }
 
-export function ProgressBar({ value, color = C.accent, height = 10 }: { value: number; color?: string; height?: number }) {
-  return (
-    <View style={[styles.track, { height }]}>
-      <View
-        style={[
-          styles.fill,
-          { width: `${Math.max(0, Math.min(1, value)) * 100}%`, backgroundColor: color },
-        ]}
-      />
-    </View>
-  );
-}
-
 /** Big chunky number with a white outline, e.g. "82%". */
 export function BigNumber({ value, suffix, size = 96 }: { value: string; suffix?: string; size?: number }) {
   const o = Math.max(3, Math.round(size / 18)); // outline thickness

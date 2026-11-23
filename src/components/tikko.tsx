@@ -50,7 +50,7 @@ export type Act =
   | 'windup' // big wind-up key in its back
   | 'party' // confetti
   | 'ring' // bells ringing loudly
-  | 'crown'; // level up
+  | 'crown'; // spare pose (not used yet)
 
 /** Every illustrated pose Tikko can have. Only some have artwork so far. */
 type PoseImage =
@@ -136,8 +136,6 @@ type Props = {
   act?: Act;
   /** Show Tikko asleep (outside your tracked hours). */
   sleeping?: boolean;
-  /** Level stage. Reserved for crown/badge artwork; not shown yet. */
-  stage?: 1 | 2 | 3;
   size?: number;
   /** Increment to make Tikko do one small hop (e.g. after a check-in). */
   bounceKey?: number;

@@ -127,7 +127,7 @@ export function NotificationPreview() {
           <Text style={styles.notifBody}>What did you do since 2 PM? Hold to log in one tap.</Text>
         </View>
       </View>
-      {['💻 Deep work', '📱 Social media', '📚 Learning', '🍽️ Meals & rest'].map((b, i) => (
+      {['💻 Deep work', '📱 Social media', '📚 Learning', '✏️ Something else…'].map((b, i) => (
         <View key={b} style={[styles.notifButton, i === 1 && { borderColor: C.ink, borderWidth: 2.5 }]}>
           <Text style={styles.notifButtonText}>{b}</Text>
         </View>

@@ -57,7 +57,7 @@ export default function DayScreen() {
       <Card style={{ gap: S.sm }}>
         <Heading>{summary.logged}h logged</Heading>
         <Small>
-          {summary.focus}h focus · {summary.neutral}h other · {summary.drain}h scrolling & distractions
+          {summary.focus}h focus · {summary.neutral}h other · {summary.drain}h distracted
         </Small>
         <StackedBar summary={summary} />
       </Card>

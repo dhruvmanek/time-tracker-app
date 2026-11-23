@@ -7,7 +7,7 @@
 
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 import { DEFAULT_QUICK_IDS, getCategory } from './categories';
 import { track } from './analytics';
@@ -41,6 +41,25 @@ if (supported) {
   });
 }
 
+/** Whether iOS currently allows Tikko to send notifications. */
+export async function notificationsAllowed(): Promise<boolean> {
+  if (!supported) return true;
+  return (await Notifications.getPermissionsAsync()).granted;
+}
+
+/**
+ * Turn check-ins on: ask iOS if we haven't yet; if the user said no before,
+ * iOS won't ask again, so open Tikko's page in the iPhone Settings app instead.
+ */
+export async function enableCheckIns(): Promise<boolean> {
+  if (!supported) return false;
+  const current = await Notifications.getPermissionsAsync();
+  if (current.granted) return true;
+  if (current.canAskAgain) return (await Notifications.requestPermissionsAsync()).granted;
+  await Linking.openSettings();
+  return false;
+}
+
 export async function requestPermission(): Promise<boolean> {
   if (!supported) return false;
   const current = await Notifications.getPermissionsAsync();
@@ -62,7 +81,7 @@ async function registerActions() {
         identifier: ACTION_PREFIX + id,
         buttonTitle: `${c.emoji} ${c.name}`,
         // iOS only delivers button taps to a closed app if it opens the app.
-        // The app opens straight onto the "+XP" reward screen.
+        // The app opens straight onto the "Hour logged" reward screen.
         options: { opensAppToForeground: true },
       };
     }),
@@ -133,21 +152,6 @@ async function doReschedule() {
       hour: settings.dayEnd % 24,
       minute: 15,
     },
-  });
-}
-
-export async function sendTestNotification() {
-  if (!supported) return;
-  await registerActions();
-  const now = new Date().getHours();
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Tikko ⏳ (test)',
-      body: `What did you do since ${formatHour(Math.max(now - 1, 0))}? Hold to log in one tap.`,
-      categoryIdentifier: CATEGORY_ID,
-      data: { start: Math.max(now - 1, 0), end: Math.max(now, 1) },
-    },
-    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5 },
   });
 }
 

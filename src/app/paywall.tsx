@@ -10,14 +10,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
+import { PRIVACY_URL, TERMS_URL } from '@/constants/links';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import { scheduleTrialReminder } from '@/lib/notifications';
 import { buy, loadPlans, restore, storeReady, type Plan } from '@/lib/purchases';
 
-// TODO: replace with Tikko's own privacy policy page before launch (Apple requires one).
-const PRIVACY_URL = 'https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md';
-const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 
 export default function Paywall() {
   const insets = useSafeAreaInsets();

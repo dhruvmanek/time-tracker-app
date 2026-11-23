@@ -1,72 +1,59 @@
 # Tikko ⏳
 
-Tikko is an iPhone app that asks you what you did every hour, then shows where your time really goes.
-Tikko is a little alarm-clock critter living in its own world. Focused hours keep it charged and the
-meadow sunny. Hours lost to scrolling drain its energy and turn the world dusky and wilted.
+Tikko is an iPhone app that asks what you did every hour, then shows where your time really goes.
+Tikko is a little alarm-clock mascot whose mood follows your day.
 
-Built with [Expo](https://expo.dev) (React Native + TypeScript), so it can be built and published **without a Mac**.
+Built with [Expo](https://expo.dev) (React Native + TypeScript), so it can be built and published without a Mac.
 
-## What works now (v0.2)
+## Features
 
-- **Hourly check-ins**: repeating notifications during your waking hours. Long-press one and tap a category button to log it.
-- **Check-in screen**: pick a category for one or more hours, with an optional note.
-- **Home**: Tikko in its world, a big energy %, today's focus/drain stats, level and streak, and a button for hours you haven't logged.
-- **One-tap check-in**: your usual activities on top. Tapping one logs it instantly and shows a "+XP" reward screen.
-- **Day**: the full hour-by-hour timeline, with arrows to look back at past days.
-- **Insights**: focus score, biggest time sink, time per category, and a 7-day chart with your "danger hours".
-- **Game rules**: +10 XP per logged hour, +5 for logging on time, a streak for every day with 4+ hours logged. Energy starts at 80% each day: +6 per focus hour, −12 per drain hour. Tikko earns a star badge at level 4 and a crown at level 8.
-- **Settings**: day start/end, check-in every 1h or 2h, test notification.
-- All data stays on the phone.
+- **Hourly check-ins:** notifications during your waking hours with one-tap buttons
+  (your 3 most-used activities + "Something else…").
+- **Today (Home):** Tikko asks about the hour you haven't logged; one button logs it;
+  your day as a single strip. Tap Tikko and it waves in its current mood.
+- **Check-in:** 14 activities; after logging, an optional detail ("Which app?").
+- **Your day:** hour-by-hour timeline with past days.
+- **Insights:** focus score, biggest time sink (and what it mostly was), time per activity,
+  7-day chart, danger hours.
+- **End-of-day recap:** notification after your last check-in; focus vs your week,
+  time sink, best stretch, one suggestion for tomorrow, "How did today feel?", streak.
+- **Onboarding:** short quiz, "years of your life" moment, hold to wind up Tikko.
+- **Subscriptions:** hard paywall with a 3-day free trial (yearly $39.99 / monthly $4.99)
+  via RevenueCat; trial-ending reminder.
+- **Analytics:** anonymous PostHog events (never what you type).
+- **Ratings:** asks for an App Store rating at a happy moment.
+- All check-ins stay on the phone.
 
 ## Where things live
 
 | Folder / file | What it is |
 |---|---|
 | `src/app/` | Screens. Every file is a screen (`(tabs)/index.tsx` = Today). |
-| `src/components/tikk.tsx` | The Tikko character and its moods |
-| `src/components/scene.tsx` | Tikko's world (changes with its mood) |
-| `src/components/tab-bar.tsx` | Bottom bar with the raised Log button |
-| `src/lib/stats.ts` | Game rules: XP, levels, streaks, mood |
-| `src/lib/notifications.ts` | Check-in notifications |
-| `src/lib/categories.ts` | The activity categories (names, emoji, colours) |
-| `src/constants/theme.ts` | Colours, fonts and the sticker style |
+| `src/components/tikko.tsx` | The mascot: poses, moods and animation |
+| `assets/mascot/` | Mascot pose images (see `docs/mascot.md`) |
+| `src/lib/categories.ts` | Activities, their colours, Tikko's pose and detail question |
+| `src/lib/stats.ts` | Streaks, moods and the numbers behind Insights |
+| `src/lib/recap.ts` | End-of-day recap and its suggestion rules |
+| `src/lib/notifications.ts` | Check-in, recap and trial notifications |
+| `src/lib/purchases.ts` | Subscriptions (RevenueCat) |
+| `src/lib/analytics.ts` | Analytics events (PostHog) |
+| `src/constants/theme.ts` | Colours, fonts, spacing |
+| `src/constants/links.ts` | Support, privacy and App Store links |
+| `docs/app-store.md` | App Store listing and ASO |
 
-## Running it from Windows (one-time setup)
-
-1. Install **Node.js LTS** from https://nodejs.org and **Git** from https://git-scm.com.
-2. Open **PowerShell** and run:
-   ```
-   git clone https://github.com/dhruvmanek/time-tracker-app.git
-   cd time-tracker-app
-   npm install
-   ```
-
-### Quick preview on your iPhone (Expo Go)
-
-1. Install **Expo Go** from the App Store on your iPhone.
-2. On your laptop run `npx expo start` and scan the QR code with the iPhone camera.
-   The phone and laptop must be on the same Wi-Fi. If it doesn't connect, run `npx expo start --tunnel`.
-
-Notification buttons may not behave exactly as in the real app inside Expo Go. Use TestFlight (below) to test those.
-
-### Real app on your iPhone (TestFlight)
-
-Needs an Apple Developer account ($99/year, https://developer.apple.com/programs/).
+## Running it from Windows
 
 ```
-npm install -g eas-cli
-eas login
+git pull
+npm install
+npx expo start --tunnel
+```
+
+Scan the QR code with the iPhone camera (Expo Go). Purchases and notification buttons only
+work in a real build:
+
+```
 eas build --platform ios --profile production --auto-submit
 ```
 
-EAS builds the app on Expo's Macs and uploads it to App Store Connect.
-When it finishes, install the **TestFlight** app on your iPhone and open Tikko from there.
-
-## Roadmap
-
-- [x] Week 1: check-ins, notifications, timeline, insights, XP/streaks, placeholder Tikko
-- [x] Week 2: Brain Rot-inspired redesign: alarm-clock Tikko, living world, one-tap check-in, reward screen
-- [ ] Next: onboarding quiz (goal, waking hours, "hours lost" → years of life), "hold to wind up Tikko" commitment
-- [ ] Paywall: yearly plan (pre-selected) with a **3-day free trial**, plus monthly; one exit discount; RevenueCat
-- [ ] Week 3: illustrated and animated Tikko (Rive), more evolutions and unlockables
-- [ ] Week 4: subscriptions (RevenueCat), paywall, analytics (PostHog), App Store listing
+Then open Tikko from TestFlight.

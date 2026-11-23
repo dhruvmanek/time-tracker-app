@@ -15,8 +15,10 @@ import { C, F, R, S, sticker } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
 import { track } from '@/lib/analytics';
 import { onCelebrate } from '@/lib/celebrate';
+import { enableCheckIns } from '@/lib/notifications';
+import { useCheckInsOn } from '@/hooks/use-checkins-on';
 import { energyFor, moodForEnergy, pendingRange, streak, summarize } from '@/lib/stats';
-import { useAppState } from '@/lib/store';
+import { updateSettings, useAppState } from '@/lib/store';
 import { dateKey, formatHour, formatRange } from '@/lib/time';
 import type { DayLog, Mood } from '@/lib/types';
 
@@ -35,6 +37,7 @@ export default function HomeScreen() {
   }, [said]);
 
   const { dayStart, dayEnd } = state.settings;
+  const ringing = useCheckInsOn();
   const today = dateKey(now);
   const day = state.logs[today] ?? {};
   const summary = summarize([day]);
@@ -117,6 +120,15 @@ export default function HomeScreen() {
         />
       )}
 
+      {!ringing && (
+        <Pressable
+          onPress={async () => updateSettings({ notificationsOn: await enableCheckIns() })}
+          style={({ pressed }) => [styles.warn, pressed && { opacity: 0.85 }]}>
+          <Text style={styles.warnText}>🔕 Check-ins are off, so Tikko can’t ring.</Text>
+          <Text style={styles.warnAction}>Turn on</Text>
+        </Pressable>
+      )}
+
       <Pressable onPress={() => router.push('/day')} style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}>
         <View style={styles.cardHead}>
           <Text style={styles.cardLabel}>TODAY</Text>
@@ -133,7 +145,7 @@ export default function HomeScreen() {
         <View style={styles.legend}>
           <Legend color={C.focus} label={`${summary.focus}h focus`} />
           <Legend color={C.neutral} label={`${summary.neutral}h other`} />
-          <Legend color={C.drain} label={`${summary.drain}h scrolling`} />
+          <Legend color={C.drain} label={`${summary.drain}h distracted`} />
         </View>
       </Pressable>
     </ScrollView>
@@ -191,7 +203,7 @@ function greeting(h: number) {
 function summaryLine(logged: number, focus: number, drain: number, mood: Mood) {
   if (logged === 0) return 'I’ll ring at the next hour. See you then!';
   if (mood === 'radiant') return `${focus}h of focus already. We’re on fire!`;
-  if (mood === 'drained') return `${drain}h lost to scrolling. One focused hour?`;
+  if (mood === 'drained') return `${drain}h lost to distractions. One focused hour?`;
   return `All caught up. ${logged}h logged so far.`;
 }
 
@@ -245,6 +257,17 @@ const styles = StyleSheet.create({
   },
   tikko: { alignItems: 'center', marginTop: -S.xs, marginBottom: S.xs },
   card: { ...sticker, backgroundColor: C.card, borderRadius: R.lg, padding: S.md },
+  warn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: S.sm,
+    backgroundColor: '#FDECE8',
+    borderRadius: R.md,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  warnText: { flex: 1, fontFamily: F.medium, fontSize: 14, color: C.ink },
+  warnAction: { fontFamily: F.semibold, fontSize: 14, color: C.drain },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   cardLabel: { fontFamily: F.semibold, fontSize: 12, color: C.sub, letterSpacing: 0.6 },
   cardMeta: { fontFamily: F.medium, fontSize: 13, color: C.sub },

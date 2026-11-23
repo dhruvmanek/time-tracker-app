@@ -59,7 +59,7 @@ export default function InsightsScreen() {
           <View style={styles.statsRow}>
             <Stat label="Focus score" value={focusPct === null ? '–' : `${focusPct}%`} color={C.focus} />
             <Stat label="Hours logged" value={`${summary.logged}h`} color={C.ink} />
-            <Stat label="Drain" value={`${summary.drain}h`} color={C.drain} />
+            <Stat label="Distracted" value={`${summary.drain}h`} color={C.drain} />
           </View>
 
           {sink && (
@@ -128,8 +128,8 @@ function WeekChart() {
       </View>
       <View style={styles.legend}>
         <Legend color={C.focus} label="Focus" />
-        <Legend color={C.neutral} label="Neutral" />
-        <Legend color={C.drain} label="Drain" />
+        <Legend color={C.neutral} label="Other" />
+        <Legend color={C.drain} label="Distracted" />
       </View>
     </Card>
   );
@@ -150,7 +150,7 @@ function DangerHours() {
       {worst.map((h) => (
         <View key={h.hour} style={styles.dangerRow}>
           <Body style={{ fontFamily: F.bold }}>{formatRange(h.hour, h.hour + 1)}</Body>
-          <Body style={{ color: C.drain, fontFamily: F.bold }}>{Math.round((h.drain / h.total) * 100)}% drain</Body>
+          <Body style={{ color: C.drain, fontFamily: F.bold }}>{Math.round((h.drain / h.total) * 100)}% distracted</Body>
         </View>
       ))}
     </Card>

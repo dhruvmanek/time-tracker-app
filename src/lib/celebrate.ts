@@ -1,4 +1,4 @@
-// A tiny event bus so any screen can trigger the "+XP" celebration toast.
+// A tiny event bus: the reward screen tells Home to give Tikko a little hop.
 
 type Listener = (message: string) => void;
 const listeners = new Set<Listener>();

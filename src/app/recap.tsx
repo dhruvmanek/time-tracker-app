@@ -80,7 +80,7 @@ export default function RecapScreen() {
             <View style={styles.legend}>
               <Legend color={C.focus} label={`${summary.focus}h focus`} />
               <Legend color={C.neutral} label={`${summary.neutral}h other`} />
-              <Legend color={C.drain} label={`${summary.drain}h scrolling`} />
+              <Legend color={C.drain} label={`${summary.drain}h distracted`} />
             </View>
           </Animated.View>
         )}

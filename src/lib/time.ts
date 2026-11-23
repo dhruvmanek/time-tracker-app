@@ -23,11 +23,6 @@ export function formatRange(start: number, end: number): string {
   return `${formatHour(start)}–${formatHour(end)}`;
 }
 
-export function formatDuration(hours: number): string {
-  if (hours === 0) return '0h';
-  return `${hours}h`;
-}
-
 export function shortWeekday(d: Date): string {
   return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
 }

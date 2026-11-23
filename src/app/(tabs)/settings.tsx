@@ -1,20 +1,33 @@
 import Constants from 'expo-constants';
+import * as StoreReview from 'expo-store-review';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect } from 'react';
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Body, Button, Card, Heading, Small, Title } from '@/components/ui';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
+import { Body, Card, Heading, Small, Title } from '@/components/ui';
+import {
+  APP_STORE_ID,
+  MANAGE_SUBSCRIPTION_URL,
+  PRIVACY_URL,
+  SUPPORT_EMAIL,
+  SUPPORT_URL,
+  TERMS_URL,
+} from '@/constants/links';
 import { C, F, R, S, sticker } from '@/constants/theme';
-import { requestPermission, rescheduleAll, sendTestNotification } from '@/lib/notifications';
+import { useCheckInsOn } from '@/hooks/use-checkins-on';
+import { enableCheckIns, rescheduleAll } from '@/lib/notifications';
+import { restore } from '@/lib/purchases';
 import { checkInHours } from '@/lib/stats';
-import { replayOnboarding, resetAll, updateSettings, useAppState } from '@/lib/store';
+import { resetAll, updateSettings, useAppState } from '@/lib/store';
 import { formatHour } from '@/lib/time';
 
 export default function SettingsScreen() {
   const { settings } = useAppState();
   const insets = useSafeAreaInsets();
+  const ringing = useCheckInsOn();
+  const [restoring, setRestoring] = useState(false);
 
   // Re-schedule whenever the check-in settings change.
   useEffect(() => {
@@ -22,6 +35,41 @@ export default function SettingsScreen() {
   }, [settings.dayStart, settings.dayEnd, settings.interval, settings.notificationsOn]);
 
   const count = checkInHours(settings).length;
+  const open = (url: string) => WebBrowser.openBrowserAsync(url);
+
+  const toggleCheckIns = async (on: boolean) => {
+    if (!on) return updateSettings({ notificationsOn: false });
+    const ok = await enableCheckIns();
+    updateSettings({ notificationsOn: ok || Platform.OS === 'web' });
+  };
+
+  const rate = async () => {
+    if (APP_STORE_ID) {
+      Linking.openURL(`itms-apps://apps.apple.com/app/id${APP_STORE_ID}?action=write-review`);
+    } else if (await StoreReview.isAvailableAsync()) {
+      StoreReview.requestReview();
+    }
+  };
+
+  const feedback = () => {
+    if (SUPPORT_EMAIL) Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Tikko feedback')}`);
+    else open(SUPPORT_URL);
+  };
+
+  const onRestore = async () => {
+    setRestoring(true);
+    const ok = await restore();
+    setRestoring(false);
+    Alert.alert(ok ? 'All set' : 'Nothing to restore', ok ? 'Your subscription is active.' : 'We couldn’t find a Tikko subscription for this Apple ID.');
+  };
+
+  const erase = () => {
+    if (Platform.OS === 'web') return resetAll();
+    Alert.alert('Erase all your data?', 'All check-ins, details and streaks will be deleted. Your subscription stays active.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Erase', style: 'destructive', onPress: resetAll },
+    ]);
+  };
 
   return (
     <ScrollView
@@ -35,19 +83,14 @@ export default function SettingsScreen() {
       <Card style={{ gap: S.md }}>
         <Heading>Check-ins</Heading>
         <View style={styles.row}>
-          <Body>Reminders</Body>
-          <Switch
-            value={settings.notificationsOn}
-            trackColor={{ true: C.accent }}
-            onValueChange={async (on) => {
-              if (on && !(await requestPermission()) && Platform.OS !== 'web') {
-                Alert.alert('Notifications are off', 'Turn on notifications for Tikko in the iPhone Settings app.');
-                return;
-              }
-              updateSettings({ notificationsOn: on });
-            }}
-          />
+          <Body>Hourly check-ins</Body>
+          <Switch value={ringing} trackColor={{ true: C.accent }} onValueChange={toggleCheckIns} />
         </View>
+        {settings.notificationsOn && !ringing && (
+          <Small style={{ color: C.drain }}>
+            Notifications are turned off for Tikko in your iPhone Settings, so Tikko can’t ring. Tap the switch to fix it.
+          </Small>
+        )}
         <HourStepper
           label="Day starts"
           value={settings.dayStart}
@@ -77,44 +120,41 @@ export default function SettingsScreen() {
         </View>
         <Small>
           Tikko will check in {count} times a day, from {formatHour(settings.dayStart + settings.interval)} to{' '}
-          {settings.dayEnd === 24 ? 'midnight' : formatHour(settings.dayEnd)}.
+          {settings.dayEnd === 24 ? 'midnight' : formatHour(settings.dayEnd)}, then send your recap.
         </Small>
-        <Button label="Send a test notification" variant="light" onPress={sendTestNotification} />
-        <Small>Arrives in 5 seconds. Lock your phone, then long-press it to see the quick-log buttons.</Small>
       </Card>
 
-      <Card style={{ gap: S.sm }}>
-        <Heading>Subscription</Heading>
-        <Small>Tikko Premium is active. You can change or cancel it any time with Apple.</Small>
-        <Button
-          label="Manage subscription"
-          variant="light"
-          onPress={() => WebBrowser.openBrowserAsync('https://apps.apple.com/account/subscriptions')}
-        />
+      <Card style={{ paddingVertical: 4 }}>
+        <Row label="Manage subscription" onPress={() => open(MANAGE_SUBSCRIPTION_URL)} />
+        <Row label={restoring ? 'Restoring…' : 'Restore purchases'} onPress={onRestore} last />
       </Card>
 
-      <Card style={{ gap: S.sm }}>
-        <Heading>Data</Heading>
-        <Button label="Replay the intro" variant="light" onPress={replayOnboarding} />
-        <Small>Everything is stored only on this iPhone.</Small>
-        <Button
-          label="Erase all data"
-          variant="ghost"
-          onPress={() => {
-            if (Platform.OS === 'web') {
-              resetAll();
-              return;
-            }
-            Alert.alert('Erase everything?', 'All check-ins and streaks will be deleted.', [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Erase', style: 'destructive', onPress: resetAll },
-            ]);
-          }}
-        />
+      <Card style={{ paddingVertical: 4 }}>
+        <Row label="Rate Tikko ⭐" onPress={rate} />
+        <Row label="Send feedback" onPress={feedback} />
+        <Row label="Privacy policy" onPress={() => open(PRIVACY_URL)} />
+        <Row label="Terms of use" onPress={() => open(TERMS_URL)} last />
       </Card>
 
-      <Small style={{ textAlign: 'center' }}>Tikko v{Constants.expoConfig?.version ?? '1.0.0'}</Small>
+      <Card style={{ paddingVertical: 4 }}>
+        <Row label="Erase all data" onPress={erase} danger last />
+      </Card>
+
+      <Small style={{ textAlign: 'center' }}>
+        Tikko v{Constants.expoConfig?.version ?? '1.0.0'} · Your check-ins are stored only on this iPhone.
+      </Small>
     </ScrollView>
+  );
+}
+
+function Row({ label, onPress, danger, last }: { label: string; onPress: () => void; danger?: boolean; last?: boolean }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.linkRow, !last && styles.divider, pressed && { opacity: 0.6 }]}>
+      <Text style={[styles.linkText, danger && { color: C.drain }]}>{label}</Text>
+      {!danger && <Text style={styles.chevron}>›</Text>}
+    </Pressable>
   );
 }
 
@@ -165,4 +205,8 @@ const styles = StyleSheet.create({
   },
   stepText: { fontSize: 22, fontFamily: F.bold, color: C.ink, marginTop: -2 },
   stepValue: { width: 80, textAlign: 'center', fontFamily: F.bold, color: C.ink },
+  linkRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
+  divider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.faint },
+  linkText: { fontFamily: F.medium, fontSize: 16, color: C.ink },
+  chevron: { fontFamily: F.medium, fontSize: 22, color: C.faint, marginTop: -2 },
 });

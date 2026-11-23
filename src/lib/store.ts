@@ -180,11 +180,6 @@ export function updateProfile(patch: Partial<Profile>) {
   setState((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
 }
 
-/** Show the intro again (keeps all logs). */
-export function replayOnboarding() {
-  setState((s) => ({ ...s, onboarded: false }));
-}
-
 export function rateDay(date: string, rating: number) {
   setState((s) => ({ ...s, dayRatings: { ...(s.dayRatings ?? {}), [date]: rating } }));
 }
@@ -212,6 +207,7 @@ export function markResponseHandled(key: string): boolean {
   return true;
 }
 
+/** Erase all check-ins and answers, but keep the subscription, so nobody gets locked out. */
 export function resetAll() {
-  setState(() => ({ ...initialState }));
+  setState((s) => ({ ...initialState, premium: s.premium, reviewAskedAt: s.reviewAskedAt }));
 }
