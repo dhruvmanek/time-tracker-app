@@ -43,7 +43,9 @@ export default function HomeScreen() {
   const hour = now.getHours();
   const asleep = !pending && (hour >= dayEnd || hour < dayStart);
   const days = streak(state, now);
-  const due = Math.max(0, Math.min(hour, dayEnd) - dayStart);
+  const due = Math.max(Math.min(hour, dayEnd) - dayStart, summary.logged, 0);
+  // From the last hour of your day until bedtime, Home offers the recap.
+  const evening = summary.logged > 0 && (hour >= dayEnd - 1 || hour < dayStart);
 
   const question = pending
     ? `What did you do from ${formatRange(pending.start, pending.end).replace('–', ' to ')}?`
@@ -108,7 +110,11 @@ export default function HomeScreen() {
           }
         />
       ) : (
-        <Button variant="light" label="See your whole day" onPress={() => router.push('/day')} />
+        <Button
+          variant={evening ? 'primary' : 'light'}
+          label={evening ? 'See today’s recap ✨' : 'See your whole day'}
+          onPress={() => router.push(evening ? '/recap' : '/day')}
+        />
       )}
 
       <Pressable onPress={() => router.push('/day')} style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}>

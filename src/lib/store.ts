@@ -185,6 +185,10 @@ export function replayOnboarding() {
   setState((s) => ({ ...s, onboarded: false }));
 }
 
+export function rateDay(date: string, rating: number) {
+  setState((s) => ({ ...s, dayRatings: { ...(s.dayRatings ?? {}), [date]: rating } }));
+}
+
 export function markReviewAsked() {
   setState((s) => ({ ...s, reviewAskedAt: Date.now() }));
 }

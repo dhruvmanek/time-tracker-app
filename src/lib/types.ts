@@ -53,6 +53,8 @@ export type AppState = {
   premium: boolean;
   /** When we last asked for an App Store rating (ms). */
   reviewAskedAt?: number;
+  /** How each day felt (1–5), keyed by date, from the evening recap. */
+  dayRatings?: Record<string, number>;
   profile: Profile;
   settings: Settings;
   /** Logs keyed by local date "YYYY-MM-DD". */

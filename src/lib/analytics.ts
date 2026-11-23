@@ -60,4 +60,6 @@ export type Event =
   | 'day_opened'
   | 'insights_viewed'
   | 'notification_opened'
-  | 'review_prompted';
+  | 'review_prompted'
+  | 'recap_viewed'
+  | 'day_rated';

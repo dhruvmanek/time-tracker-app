@@ -120,6 +120,20 @@ async function doReschedule() {
       },
     });
   }
+
+  // The evening recap, 15 minutes after the last check-in.
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'Tikko ✨',
+      body: 'Your day is ready. See where your hours went, and one idea for tomorrow.',
+      data: { kind: 'recap' },
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour: settings.dayEnd % 24,
+      minute: 15,
+    },
+  });
 }
 
 export async function sendTestNotification() {
@@ -147,7 +161,12 @@ async function handleResponse(
   const key = `${notification.request.identifier}@${notification.date}:${actionIdentifier}`;
   if (!markResponseHandled(key)) return;
 
-  const data = notification.request.content.data as { start?: number; end?: number };
+  const data = notification.request.content.data as { start?: number; end?: number; kind?: string };
+  if (data?.kind === 'recap') {
+    track('notification_opened', { action: 'recap' });
+    router.push('/recap');
+    return;
+  }
   if (typeof data?.start !== 'number' || typeof data?.end !== 'number') return;
   // The midnight check-in arrives on the next calendar day but is about the day before.
   const firedAt = notificationTime(notification.date);

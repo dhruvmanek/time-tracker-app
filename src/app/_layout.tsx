@@ -72,6 +72,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
         <Stack.Screen name="day" />
+        <Stack.Screen name="recap" options={{ presentation: 'modal' }} />
         <Stack.Screen
           name="reward"
           options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }}
