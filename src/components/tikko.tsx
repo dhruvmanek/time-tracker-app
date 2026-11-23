@@ -35,6 +35,8 @@ export type PropId =
   | 'wheel'
   | 'clipboard'
   | 'lotus'
+  | 'music'
+  | 'sleep'
   | 'swirl'
   | 'sunglasses';
 
@@ -84,6 +86,7 @@ const POSE_IMAGES: Partial<Record<PoseImage, PoseArt>> = {
   heart: { src: require('@/assets/mascot/heart.png') },
   basket: { src: require('@/assets/mascot/basket.png') },
   lotus: { src: require('@/assets/mascot/lotus.png'), wide: 1.01 },
+  music: { src: require('@/assets/mascot/music.png') },
   dumbbell: { src: require('@/assets/mascot/dumbbell.png'), wide: 1.22 },
   book: { src: require('@/assets/mascot/book.png') },
   laptop: { src: require('@/assets/mascot/laptop.png') },
