@@ -1,9 +1,9 @@
 // Outside links used in the app. Fill in the two blanks before launch.
 
 /** The numeric "Apple ID" of the app, from App Store Connect → App Information. */
-export const APP_STORE_ID = '';
+export const APP_STORE_ID = '6835830059';
 /** Where "Send feedback" goes. Until set, it opens the GitHub issues page. */
-export const SUPPORT_EMAIL = '';
+export const SUPPORT_EMAIL = 'tikko.app.help@gmail.com';
 
 export const PRIVACY_URL = 'https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md';
 export const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';

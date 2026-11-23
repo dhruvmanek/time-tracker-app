@@ -45,7 +45,7 @@ export default function RootLayout() {
     SplashScreen.hideAsync();
     if (!onboarded && segments[0] !== 'onboarding') {
       router.replace('/onboarding');
-    } else if (onboarded && !premium && segments[0] !== 'paywall') {
+    } else if (onboarded && !premium && segments[0] !== 'paywall' && segments[0] !== 'legal') {
       // Hard paywall: after onboarding, the app needs an active trial or subscription.
       router.replace('/paywall');
     }
@@ -73,6 +73,7 @@ export default function RootLayout() {
         <Stack.Screen name="check-in" options={{ presentation: 'modal' }} />
         <Stack.Screen name="day" />
         <Stack.Screen name="recap" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="legal" options={{ presentation: 'modal' }} />
         <Stack.Screen
           name="reward"
           options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }}

@@ -82,12 +82,13 @@ export default function InsightsScreen() {
             </Card>
           )}
 
+          {range === 'week' && <WeekChart />}
+
           <Card style={{ gap: S.md }}>
             <Heading>Where your time went</Heading>
             <CategoryBars summary={summary} />
           </Card>
 
-          {range === 'week' && <WeekChart />}
           {range === 'week' && <DangerHours />}
         </>
       )}

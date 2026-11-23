@@ -21,4 +21,4 @@ Purchases are handled by Apple. Tikko uses RevenueCat to check whether your subs
 - No accounts, no tracking across other companies' apps or websites, no ads, and no selling of data.
 
 ## Contact
-Questions? Open an issue at https://github.com/dhruvmanek/time-tracker-app/issues.
+Questions? Email tikko.app.help@gmail.com.

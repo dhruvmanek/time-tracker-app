@@ -3,14 +3,12 @@
 
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
-import { PRIVACY_URL, TERMS_URL } from '@/constants/links';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import { scheduleTrialReminder } from '@/lib/notifications';
@@ -147,9 +145,9 @@ export default function Paywall() {
           </Text>
         )}
         <Text style={styles.links}>
-          <Text onPress={() => WebBrowser.openBrowserAsync(TERMS_URL)}>Terms</Text>
+          <Text onPress={() => router.push({ pathname: '/legal', params: { doc: 'terms' } })}>Terms</Text>
           {'  ·  '}
-          <Text onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}>Privacy</Text>
+          <Text onPress={() => router.push({ pathname: '/legal', params: { doc: 'privacy' } })}>Privacy</Text>
           {!storeReady ? '  ·  Test mode' : ''}
         </Text>
       </View>

@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import * as StoreReview from 'expo-store-review';
 import * as WebBrowser from 'expo-web-browser';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,15 +11,13 @@ import { Body, Card, Heading, Small, Title } from '@/components/ui';
 import {
   APP_STORE_ID,
   MANAGE_SUBSCRIPTION_URL,
-  PRIVACY_URL,
   SUPPORT_EMAIL,
   SUPPORT_URL,
-  TERMS_URL,
 } from '@/constants/links';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { useCheckInsOn } from '@/hooks/use-checkins-on';
 import { enableCheckIns, rescheduleAll } from '@/lib/notifications';
-import { restore } from '@/lib/purchases';
+import { manageSubscription, restore } from '@/lib/purchases';
 import { checkInHours } from '@/lib/stats';
 import { resetAll, updateSettings, useAppState } from '@/lib/store';
 import { formatHour } from '@/lib/time';
@@ -54,6 +53,11 @@ export default function SettingsScreen() {
   const feedback = () => {
     if (SUPPORT_EMAIL) Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Tikko feedback')}`);
     else open(SUPPORT_URL);
+  };
+
+  // Apple's own subscription sheet, inside the app. Falls back to the web page only if it can't open.
+  const onManage = async () => {
+    if (!(await manageSubscription())) open(MANAGE_SUBSCRIPTION_URL);
   };
 
   const onRestore = async () => {
@@ -125,15 +129,15 @@ export default function SettingsScreen() {
       </Card>
 
       <Card style={{ paddingVertical: 4 }}>
-        <Row label="Manage subscription" onPress={() => open(MANAGE_SUBSCRIPTION_URL)} />
+        <Row label="Manage subscription" onPress={onManage} />
         <Row label={restoring ? 'Restoring…' : 'Restore purchases'} onPress={onRestore} last />
       </Card>
 
       <Card style={{ paddingVertical: 4 }}>
         <Row label="Rate Tikko ⭐" onPress={rate} />
         <Row label="Send feedback" onPress={feedback} />
-        <Row label="Privacy policy" onPress={() => open(PRIVACY_URL)} />
-        <Row label="Terms of use" onPress={() => open(TERMS_URL)} last />
+        <Row label="Privacy policy" onPress={() => router.push({ pathname: '/legal', params: { doc: 'privacy' } })} />
+        <Row label="Terms of use" onPress={() => router.push({ pathname: '/legal', params: { doc: 'terms' } })} last />
       </Card>
 
       <Card style={{ paddingVertical: 4 }}>

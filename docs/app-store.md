@@ -81,7 +81,7 @@ Welcome to Tikko! Hourly check-ins, one-tap logging, daily timeline and insights
 
 **URLs**
 - Privacy Policy URL: `https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md`
-- Support URL: `https://github.com/dhruvmanek/time-tracker-app/issues`
+- Support URL: `https://github.com/dhruvmanek/time-tracker-app/issues` (or a simple page with tikko.app.help@gmail.com)
 
 **Category**
 - Primary: **Productivity**

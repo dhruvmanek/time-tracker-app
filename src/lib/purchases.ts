@@ -124,6 +124,18 @@ export async function buy(plan: Plan): Promise<BuyResult> {
   }
 }
 
+/** Opens Apple's own subscription sheet inside the app (change plan, cancel). */
+export async function manageSubscription(): Promise<boolean> {
+  if (!storeReady) return false;
+  try {
+    await Purchases.showManageSubscriptions();
+    return true;
+  } catch (e) {
+    console.warn('Could not open subscription management', e);
+    return false;
+  }
+}
+
 /** Returns true if an active subscription was found. */
 export async function restore(): Promise<boolean> {
   if (!storeReady) return false;
