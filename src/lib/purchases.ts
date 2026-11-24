@@ -72,7 +72,11 @@ function trialDaysOf(pkg: PurchasesPackage): number {
   return 0;
 }
 
-/** The yearly and monthly plans, with real local prices when the store is set up. */
+/**
+ * The yearly and monthly plans, with real local prices from Apple.
+ * On iPhone this returns an empty list if prices can't be loaded, so the paywall
+ * shows "Try again" instead of fake prices. Only the web preview uses FALLBACK.
+ */
 export async function loadPlans(): Promise<Plan[]> {
   if (!storeReady) return FALLBACK;
   try {
@@ -96,21 +100,41 @@ export async function loadPlans(): Promise<Plan[]> {
         pkg: offering.monthly,
       });
     }
-    return plans.length ? plans : FALLBACK;
+    return await withTrialEligibility(plans);
   } catch (e) {
     console.warn('Could not load plans', e);
-    return FALLBACK;
+    return [];
+  }
+}
+
+/**
+ * Apple gives a free trial only once per person. If this Apple ID already used it,
+ * don't promise "3 days free": they'd be charged straight away.
+ */
+async function withTrialEligibility(plans: Plan[]): Promise<Plan[]> {
+  const ids = plans.filter((p) => p.trialDays > 0 && p.pkg).map((p) => p.pkg!.product.identifier);
+  if (ids.length === 0) return plans;
+  try {
+    const result = await Purchases.checkTrialOrIntroductoryPriceEligibility(ids);
+    return plans.map((p) => {
+      const status = p.pkg ? result[p.pkg.product.identifier]?.status : undefined;
+      return status === Purchases.INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_INELIGIBLE ? { ...p, trialDays: 0 } : p;
+    });
+  } catch {
+    return plans; // Unknown: Apple's own purchase sheet still shows the real terms.
   }
 }
 
 export type BuyResult = 'success' | 'cancelled' | 'error';
 
 export async function buy(plan: Plan): Promise<BuyResult> {
-  if (!storeReady || !plan.pkg) {
-    // Test mode: no store yet. Unlock so the rest of the app can be tested.
+  if (!storeReady) {
+    // Web preview only (no App Store): unlock so the rest of the app can be tested.
     setPremium(true);
     return 'success';
   }
+  // On iPhone, never unlock without a real Apple purchase.
+  if (!plan.pkg) return 'error';
   try {
     const { customerInfo } = await Purchases.purchasePackage(plan.pkg);
     const ok = hasPremium(customerInfo);

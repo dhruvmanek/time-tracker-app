@@ -11,6 +11,7 @@ import { Tikko } from '@/components/tikko';
 import { Button } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { track } from '@/lib/analytics';
+import { useCheckInsOn } from '@/hooks/use-checkins-on';
 import { scheduleTrialReminder } from '@/lib/notifications';
 import { buy, loadPlans, restore, storeReady, type Plan } from '@/lib/purchases';
 
@@ -21,6 +22,11 @@ export default function Paywall() {
   const [selected, setSelected] = useState<Plan['id']>('annual');
   const [busy, setBusy] = useState(false);
 
+  const ringing = useCheckInsOn();
+  const fetchPlans = () => {
+    setPlans(null);
+    loadPlans().then(setPlans);
+  };
   useEffect(() => {
     track('paywall_viewed');
     loadPlans().then(setPlans);
@@ -71,24 +77,31 @@ export default function Paywall() {
           <Tikko mood="happy" prop="clipboard" size={150} />
           <Text style={styles.title}>{trialDays > 0 ? 'How your free trial works' : 'Unlock Tikko'}</Text>
           <Text style={styles.lead}>
-            {trialDays > 0 ? 'No surprises. We’ll remind you before it ends.' : 'Know exactly where your time goes.'}
+            {trialDays > 0
+              ? ringing
+                ? 'No surprises. We’ll remind you before it ends.'
+                : 'No surprises. Cancel anytime before it ends.'
+              : 'Know exactly where your time goes.'}
           </Text>
         </View>
 
         {trialDays > 0 && plan && (
           <View style={styles.card}>
             <Step icon="🔓" bg={C.accentSoft} title="Today" text="Full access to everything. Tikko starts ringing." />
-            <Step
-              icon="🔔"
-              bg="#FFF4DA"
-              title={`Day ${trialDays - 1}`}
-              text="We send a reminder that your trial ends tomorrow."
-            />
+            {/* The reminder is a local notification, so only promise it if notifications are on. */}
+            {ringing && trialDays >= 2 && (
+              <Step
+                icon="🔔"
+                bg="#FFF4DA"
+                title={`In ${trialDays - 1} days`}
+                text="We remind you that your trial ends tomorrow."
+              />
+            )}
             <Step
               icon="⭐"
               bg={C.cardAlt}
-              title={`Day ${trialDays}`}
-              text={`You’re charged ${plan.price} for the year. Cancel anytime before.`}
+              title={`In ${trialDays} days`}
+              text={`Your trial ends and you’re charged ${plan.price}/${plan.id === 'annual' ? 'year' : 'month'}. Cancel anytime before.`}
               last
             />
           </View>
@@ -96,6 +109,14 @@ export default function Paywall() {
 
         {!plans ? (
           <ActivityIndicator color={C.accent} style={{ marginTop: S.lg }} />
+        ) : plans.length === 0 ? (
+          <View style={styles.card}>
+            <Text style={styles.stepTitle}>Couldn’t load plans</Text>
+            <Text style={styles.stepText}>Check your internet connection and try again.</Text>
+            <Pressable onPress={fetchPlans} style={styles.retry}>
+              <Text style={styles.retryText}>Try again</Text>
+            </Pressable>
+          </View>
         ) : (
           <View style={{ gap: 10 }}>
             {annual && (
@@ -260,6 +281,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
   },
   badgeText: { fontFamily: F.bold, fontSize: 10.5, color: '#FFFFFF', letterSpacing: 0.3 },
+  retry: { alignSelf: 'flex-start', marginTop: 10, backgroundColor: C.accent, borderRadius: R.md, paddingVertical: 8, paddingHorizontal: 16 },
+  retryText: { fontFamily: F.semibold, fontSize: 14.5, color: '#FFFFFF' },
   fine: { fontFamily: F.medium, fontSize: 12.5, color: C.sub, textAlign: 'center' },
   links: { fontFamily: F.medium, fontSize: 11.5, color: '#A3A7AE', textAlign: 'center' },
 });

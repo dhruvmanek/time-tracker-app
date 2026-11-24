@@ -11,8 +11,8 @@ import { Body, Card, Heading, Small, Title } from '@/components/ui';
 import {
   APP_STORE_ID,
   MANAGE_SUBSCRIPTION_URL,
+  RATE_ON_STORE_PAGE,
   SUPPORT_EMAIL,
-  SUPPORT_URL,
 } from '@/constants/links';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { useCheckInsOn } from '@/hooks/use-checkins-on';
@@ -42,18 +42,25 @@ export default function SettingsScreen() {
     updateSettings({ notificationsOn: ok || Platform.OS === 'web' });
   };
 
+  // Before launch, Tikko's App Store page doesn't exist yet, so use Apple's in-app
+  // rating popup. After launch, set RATE_ON_STORE_PAGE to true to open the review page.
   const rate = async () => {
-    if (APP_STORE_ID) {
+    if (RATE_ON_STORE_PAGE && APP_STORE_ID) {
       Linking.openURL(`itms-apps://apps.apple.com/app/id${APP_STORE_ID}?action=write-review`);
     } else if (await StoreReview.isAvailableAsync()) {
       StoreReview.requestReview();
     }
   };
 
-  const feedback = () => {
-    if (SUPPORT_EMAIL) Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Tikko feedback')}`);
-    else open(SUPPORT_URL);
+  // Mail might not be set up on this iPhone, so fall back to showing the address.
+  const feedback = async () => {
+    const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Tikko feedback')}`;
+    const canMail = await Linking.canOpenURL(mailto).catch(() => false);
+    if (canMail) Linking.openURL(mailto).catch(() => showEmail());
+    else showEmail();
   };
+  const showEmail = () =>
+    Alert.alert('Send us feedback', `Email us at ${SUPPORT_EMAIL}. We read every message.`, [{ text: 'OK' }]);
 
   // Apple's own subscription sheet, inside the app. Falls back to the web page only if it can't open.
   const onManage = async () => {

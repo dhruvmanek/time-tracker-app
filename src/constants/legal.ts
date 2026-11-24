@@ -8,35 +8,41 @@ export const PRIVACY: LegalDoc = {
   updated: 'November 2026',
   sections: [
     {
-      body: ['Tikko is a time-tracking app. We built it to keep your data on your phone.'],
+      body: ['Tikko is a time-tracking app. Your day stays on your phone. We only collect a small amount of anonymous usage data to improve the app.'],
     },
     {
-      heading: 'What Tikko stores',
+      heading: 'Stored only on your iPhone',
       body: [
-        'Your check-ins (which activity you did each hour, and any short detail you type), how each day felt, your settings and your answers to the intro questions.',
-        'All of this is stored only on your iPhone. It is not sent to us or to anyone else, and deleting the app deletes it. You can also erase it any time in Settings → Erase all data.',
+        'Your check-ins (which activity you did each hour), the details you type, your settings and your recaps are stored only on your iPhone. The details you type never leave your phone.',
+        'Deleting the app deletes this data. You can also erase it any time in Settings → Erase all data.',
+      ],
+    },
+    {
+      heading: 'Anonymous usage analytics (PostHog)',
+      body: [
+        'We use PostHog to understand how Tikko is used. It receives, tied to a random ID (not your name or email):',
+        '• How you use the app: screens opened, intro steps reached, taps on Tikko, notifications opened.',
+        '• Check-ins: the type of activity you chose (for example "Deep work"), how many hours, and whether you added a detail (never the detail itself).',
+        '• Your intro answers: your goal, what describes you, how many hours you think you lose, what you’d do with time back, and your time sinks. Your age is not sent.',
+        '• How each day felt (the 1–5 rating in the evening recap).',
+        '• Subscription events: viewing the paywall, the plan you chose, its price, and whether a trial started.',
+        '• Basic device information: device model, iOS version, app version, language and time zone.',
+        'PostHog is set to discard IP addresses.',
+      ],
+    },
+    {
+      heading: 'Subscriptions (Apple and RevenueCat)',
+      body: [
+        'Payments are handled by Apple; we never see your card details. Tikko uses RevenueCat to check whether your subscription is active. RevenueCat receives a random app user ID and your purchase history from Apple, but none of your check-ins.',
       ],
     },
     {
       heading: 'Notifications',
-      body: ['Tikko schedules hourly check-ins and an evening recap on your device. They are created locally; no notification content leaves your phone.'],
-    },
-    {
-      heading: 'Anonymous usage analytics',
-      body: [
-        'To improve Tikko, we use PostHog to collect anonymous usage events, such as which intro step you reached, whether you started a trial, and which activity category you logged (for example "Deep work").',
-        'Events are tied to a random ID, not to your name or email. We never send what you type, such as the details you add to an hour. PostHog also receives basic device information (device model, iOS version, app version, language).',
-      ],
-    },
-    {
-      heading: 'Subscriptions',
-      body: [
-        'Purchases are handled by Apple. Tikko uses RevenueCat to check whether your subscription is active. RevenueCat receives an anonymous app user ID and your purchase receipts from Apple, but no check-in data.',
-      ],
+      body: ['Check-ins, the evening recap and the trial reminder are scheduled on your device. Their content never leaves your phone.'],
     },
     {
       heading: 'What we don’t do',
-      body: ['No accounts, no tracking across other companies’ apps or websites, no ads, and no selling of data.'],
+      body: ['No accounts, no ads, no tracking across other companies’ apps or websites, and no selling of data.'],
     },
     {
       heading: 'Contact',

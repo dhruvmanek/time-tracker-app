@@ -22,14 +22,14 @@ keywords, screenshots, URLs). Character counts are checked against Apple's limit
 Tikko: Hourly Time Tracker
 ```
 
-**Subtitle** (29/30)
+**Subtitle** (23/30)
 ```
-Screen Time & Focus Check-ins
+Focus & Habit Check-ins
 ```
 
-**Keywords** (100/100). Commas, no spaces, no words already in the name or subtitle.
+**Keywords** (99/100). Commas, no spaces, no words already in the name or subtitle.
 ```
-productivity,habit,timesheet,planner,log,diary,journal,procrastination,routine,detox,adhd,study,work
+productivity,screen,distraction,planner,diary,journal,procrastination,routine,detox,adhd,study,work
 ```
 
 **Promotional text** (153/170). Can be changed any time without a new app version.
@@ -49,6 +49,11 @@ HOW IT WORKS
 • Add a quick detail if you like: which app, which project, who with.
 • See your whole day hour by hour, and look back at past days.
 
+YOUR EVENING RECAP
+• Every night, Tikko sums up your day: focus score compared with your week, your biggest time sink and your best focused stretch.
+• Get one simple, personal idea for tomorrow, based on your own patterns.
+• Rate how the day felt and keep your streak going.
+
 SEE WHERE YOUR TIME REALLY GOES
 • Focus score: how much of your day went to deep work, learning, exercise and other things that matter.
 • Biggest time sink: find out what pulls you away, and which app it usually is.
@@ -65,10 +70,10 @@ BUILT FOR
 • Anyone with ADHD who wants a gentle, low-effort way to stay aware of time
 
 PRIVATE BY DESIGN
-Your check-ins stay on your iPhone. No account, no ads.
+Your check-ins and the details you type are stored on your iPhone. No account, no ads.
 
 TIKKO PREMIUM
-Start with a 3-day free trial, then choose yearly or monthly. Payment is charged to your Apple ID when the trial ends. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel anytime in your Apple ID settings.
+Tikko requires a subscription. Choose yearly ($39.99, includes a 3-day free trial for new subscribers) or monthly ($4.99). Payment is charged to your Apple ID when you confirm the purchase, or when the free trial ends. Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in your Apple ID settings. Prices may vary by country.
 
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 Privacy Policy: https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md
@@ -76,12 +81,12 @@ Privacy Policy: https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY
 
 **What's New** (first version)
 ```
-Welcome to Tikko! Hourly check-ins, one-tap logging, daily timeline and insights. We'd love your feedback.
+Welcome to Tikko! Hourly check-ins, one-tap logging, your day hour by hour, insights and an evening recap. We'd love your feedback: tikko.app.help@gmail.com
 ```
 
 **URLs**
 - Privacy Policy URL: `https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md`
-- Support URL: `https://github.com/dhruvmanek/time-tracker-app/issues` (or a simple page with tikko.app.help@gmail.com)
+- Support URL: your Google Sites support page (it shows tikko.app.help@gmail.com)
 
 **Category**
 - Primary: **Productivity**

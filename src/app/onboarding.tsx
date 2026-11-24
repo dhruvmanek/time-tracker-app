@@ -133,7 +133,6 @@ export default function Onboarding() {
     track('onboarding_completed', {
       goal: goal[0],
       persona: persona[0],
-      age_group: age[0],
       hours_lost: hours,
       dream: dream[0],
       sinks: sinks.join(','),
@@ -325,7 +324,7 @@ export default function Onboarding() {
       );
       cta = (
         <View style={{ gap: S.xs }}>
-          <Button label="🔔 Allow notifications" onPress={() => finish(true)} />
+          <Button label="Continue" onPress={() => finish(true)} />
           <Button label="Not now" variant="ghost" onPress={() => finish(false)} />
         </View>
       );
