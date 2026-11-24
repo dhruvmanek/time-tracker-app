@@ -107,10 +107,17 @@ In App Store Connect, add the language **Spanish (Mexico)** and fill in:
 - **Description:** copy the English one for now (or ask for a translation).
 
 ## Screenshots
-The 5 screenshots are in `docs/store/screenshots/` (1290×2796, the size App Store
-Connect asks for as "6.9-inch display"). Upload them in order; the first two show in
-search results. Their headlines repeat the main search words (time, hour, log, day,
-time sinks), which helps people recognise what they searched for.
+Five screenshots in four iPhone sizes, in `docs/store/screenshots/`:
+
+| Folder | Size | Use for |
+|---|---|---|
+| `6.9-inch_1320x2868` | 1320×2868 | Large iPhones (6.9"/"large display") |
+| `6.7-inch_1290x2796` | 1290×2796 | 6.7"/6.5" iPhones |
+| `6.3-inch_1206x2622` | 1206×2622 | "iPhone with Dynamic Island (medium display)" |
+| `6.1-inch_1179x2556` | 1179×2556 | 6.1" iPhones |
+
+Upload `tikko_1.png` … `tikko_5.png` in order into the slot whose size matches. Apple
+scales them down for smaller devices. The first two show in search results.
 
 ## Ratings
 The app asks for a rating at a happy moment: after a check-in, once someone has logged
