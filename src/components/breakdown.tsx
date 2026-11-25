@@ -2,17 +2,24 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { C, F, R, S } from '@/constants/theme';
 import { getCategory } from '@/lib/categories';
+import type { Category } from '@/lib/types';
 import type { DaySummary } from '@/lib/stats';
 
-/** A single stacked bar showing how the logged hours split between categories. */
+/** Bars use only three colours: focus, other and distracted. */
+const KIND_COLOR: Record<Category['kind'], string> = { focus: C.focus, neutral: C.neutral, drain: C.drain };
+const KIND_ORDER: Category['kind'][] = ['focus', 'neutral', 'drain'];
+
+/** A single stacked bar showing how the logged hours split between focus, other and distracted. */
 export function StackedBar({ summary }: { summary: DaySummary }) {
   if (summary.logged === 0) {
     return <View style={[styles.stack, { backgroundColor: C.cardAlt }]} />;
   }
+  const byKind = { focus: 0, neutral: 0, drain: 0 };
+  for (const { id, hours } of summary.byCategory) byKind[getCategory(id).kind] += hours;
   return (
     <View style={styles.stack}>
-      {summary.byCategory.map(({ id, hours }) => (
-        <View key={id} style={{ flex: hours, backgroundColor: getCategory(id).color }} />
+      {KIND_ORDER.filter((k) => byKind[k] > 0).map((k) => (
+        <View key={k} style={{ flex: byKind[k], backgroundColor: KIND_COLOR[k] }} />
       ))}
     </View>
   );
@@ -37,7 +44,7 @@ export function CategoryBars({ summary }: { summary: DaySummary }) {
               </Text>
             </View>
             <View style={styles.track}>
-              <View style={[styles.fill, { width: `${(hours / max) * 100}%`, backgroundColor: cat.color }]} />
+              <View style={[styles.fill, { width: `${(hours / max) * 100}%`, backgroundColor: KIND_COLOR[cat.kind] }]} />
             </View>
           </View>
         );

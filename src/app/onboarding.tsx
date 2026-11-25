@@ -23,6 +23,7 @@ import { BigNumber, Button, Card } from '@/components/ui';
 import { C, F, R, S, sticker } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import { requestPermission, rescheduleAll } from '@/lib/notifications';
+import { setAcquisitionSource } from '@/lib/purchases';
 import { checkInHours } from '@/lib/stats';
 import { completeOnboarding, getState, updateProfile, updateSettings } from '@/lib/store';
 import { formatHour } from '@/lib/time';
@@ -57,6 +58,17 @@ const PERSONAS: Option[] = [
   { id: 'other', emoji: '✨', label: 'Something else' },
 ];
 
+/** Where people found Tikko. Sent to PostHog and RevenueCat to see which marketing works. */
+const SOURCES: Option[] = [
+  { id: 'tiktok', emoji: '🎵', label: 'TikTok' },
+  { id: 'instagram', emoji: '📸', label: 'Instagram' },
+  { id: 'youtube', emoji: '▶️', label: 'YouTube' },
+  { id: 'reddit', emoji: '💬', label: 'Reddit' },
+  { id: 'app_store', emoji: '🔎', label: 'App Store search' },
+  { id: 'friend', emoji: '🤝', label: 'A friend told me' },
+  { id: 'other', emoji: '✨', label: 'Somewhere else' },
+];
+
 const AGES: (Option & { mid: number })[] = [
   { id: 'u18', emoji: '🧒', label: 'Under 18', mid: 16 },
   { id: '18', emoji: '🧑', label: '18–24', mid: 21 },
@@ -75,7 +87,7 @@ const DREAMS: Option[] = [
   { id: 'Rest', emoji: '😌', label: 'Proper rest' },
 ];
 
-const STEPS = ['welcome', 'goal', 'sinks', 'persona', 'age', 'hours', 'shock', 'dream', 'schedule', 'how', 'wind', 'notify'] as const;
+const STEPS = ['welcome', 'goal', 'sinks', 'persona', 'heard', 'age', 'hours', 'shock', 'dream', 'schedule', 'how', 'wind', 'notify'] as const;
 
 
 export default function Onboarding() {
@@ -90,6 +102,7 @@ export default function Onboarding() {
   const [goal, setGoal] = useState<string[]>([]);
   const [sinks, setSinks] = useState<string[]>([]);
   const [persona, setPersona] = useState<string[]>([]);
+  const [heard, setHeard] = useState<string[]>([]);
   const [age, setAge] = useState<string[]>([]);
   const [hours, setHours] = useState(3);
   const [dream, setDream] = useState<string[]>([]);
@@ -123,6 +136,7 @@ export default function Onboarding() {
       goal: goal[0],
       sinks: sinks.filter((s) => s !== 'unsure'),
       persona: persona[0],
+      heardFrom: heard[0],
       ageGroup: age[0],
       hoursLost: hours,
       dream: dream[0],
@@ -133,11 +147,13 @@ export default function Onboarding() {
     track('onboarding_completed', {
       goal: goal[0],
       persona: persona[0],
+      heard_from: heard[0] ?? 'skipped',
       hours_lost: hours,
       dream: dream[0],
       sinks: sinks.join(','),
       notifications: granted,
     });
+    if (heard[0]) setAcquisitionSource(heard[0]);
     completeOnboarding();
     await rescheduleAll();
     // Subscribers (e.g. replaying the intro) skip the paywall.
@@ -194,6 +210,14 @@ export default function Onboarding() {
         </Question>
       );
       cta = continueBtn(persona.length === 0);
+      break;
+    case 'heard':
+      body = (
+        <Question title="Where did you hear about Tikko?" act="think">
+          <OptionList options={SOURCES} selected={heard} onToggle={single(setHeard)} />
+        </Question>
+      );
+      cta = continueBtn(false, heard.length ? 'Continue' : 'Skip');
       break;
     case 'age':
       body = (

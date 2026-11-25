@@ -36,6 +36,8 @@ export type Profile = {
   /** Category ids of the user's biggest time sinks (e.g. 'scroll', 'tv'). */
   sinks?: string[];
   persona?: string;
+  /** Where they heard about Tikko (e.g. 'tiktok'). */
+  heardFrom?: string;
   ageGroup?: string;
   /** Self-estimated hours lost per day. */
   hoursLost?: number;

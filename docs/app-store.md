@@ -27,9 +27,9 @@ Tikko: Hourly Time Tracker
 Focus & Habit Check-ins
 ```
 
-**Keywords** (99/100). Commas, no spaces, no words already in the name or subtitle.
+**Keywords** (96/100). Commas, no spaces, no words already in the name or subtitle.
 ```
-productivity,screen,distraction,planner,diary,journal,procrastination,routine,detox,adhd,study,work
+productivity,screen,distraction,log,diary,journal,procrastination,routine,detox,adhd,study,audit
 ```
 
 **Promotional text** (153/170). Can be changed any time without a new app version.
@@ -118,11 +118,48 @@ Five screenshots in four iPhone sizes, in `docs/store/screenshots/`:
 
 Upload `tikko_1.png` … `tikko_5.png` in order into the slot whose size matches. Apple
 scales them down for smaller devices. The first two show in search results.
+`docs/store/screenshots-overview.png` shows all five side by side.
+
+| # | Caption | Screen |
+|---|---|---|
+| 1 | Where did your day go? | Home with Tikko |
+| 2 | Log your hour in 1 tap | Lock-screen notification with the quick buttons |
+| 3 | Your evening recap | End-of-day recap |
+| 4 | Find your time sinks | Insights, last 7 days |
+| 5 | Tikko feels your day | "Ding! Hour logged" |
 
 ## Ratings
-The app asks for a rating at a happy moment: after a check-in, once someone has logged
-20+ hours and is on a 3-day streak. Apple decides when to actually show it (at most 3
+The app asks for a rating at a happy moment: right after someone rates their day 4 or 5
+in the evening recap (once they've logged 6+ hours). Backup: after a check-in, once
+someone has logged 20+ hours and is on a 3-day streak. At most once every 60 days. Apple decides when to actually show it (at most 3
 times a year). Ratings and reviews are one of the strongest ranking signals.
+
+## What's New (1.0.1)
+```
+Cleaner insights with one colour each for focus, other and distracted. Redeem an offer code right from the subscription screen. Small fixes and improvements.
+```
+
+## Offer codes
+1. App Store Connect → your app → **Subscriptions** → the subscription group → **Tikko Premium Yearly**
+   (or Monthly) → **Offer Codes** → create a one-time-use offer, e.g. "1 month free", 100 codes.
+2. Download the codes and send one per person.
+3. They redeem it with **Have a code?** at the bottom of the paywall (Apple's own sheet),
+   or in the App Store app → profile picture → **Redeem Gift Card or Code**.
+
+## Over-the-air updates (from 1.0.1)
+Version 1.0.1 includes `expo-updates`. After it's live, most fixes that only change the
+app's screens or text can go straight to phones without App Store review:
+```
+npx eas-cli@latest update --channel production --message "Describe the fix"
+```
+The update downloads in the background and appears the next time the app is opened.
+Anything that adds a new native library, changes app.json permissions or the icon, or
+changes the version number still needs a new build and review.
+
+## Where people heard about Tikko
+The intro asks "Where did you hear about Tikko?". The answer is in PostHog
+(`onboarding_completed` → `heard_from`) and on each RevenueCat customer as **Media source**,
+so you can compare trials and revenue by source.
 
 ## After launch
 - Check **App Store Connect → App Analytics** weekly: impressions, product page views,

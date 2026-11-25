@@ -13,7 +13,8 @@ import { C, F, R, S, sticker } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import { useCheckInsOn } from '@/hooks/use-checkins-on';
 import { scheduleTrialReminder } from '@/lib/notifications';
-import { buy, loadPlans, restore, storeReady, type Plan } from '@/lib/purchases';
+import { buy, loadPlans, redeemOfferCode, restore, storeReady, type Plan } from '@/lib/purchases';
+import { useAppState } from '@/lib/store';
 
 
 export default function Paywall() {
@@ -23,6 +24,7 @@ export default function Paywall() {
   const [busy, setBusy] = useState(false);
 
   const ringing = useCheckInsOn();
+  const { premium } = useAppState();
   const fetchPlans = () => {
     setPlans(null);
     loadPlans().then(setPlans);
@@ -39,6 +41,18 @@ export default function Paywall() {
   const savings = savingsPercent(annual, monthly);
 
   const unlock = () => router.replace('/');
+
+  // An offer code redeemed in Apple's sheet turns premium on a moment later.
+  useEffect(() => {
+    if (premium) router.replace('/');
+  }, [premium]);
+
+  const onRedeem = async () => {
+    track('offer_code_tapped');
+    if (!(await redeemOfferCode())) {
+      Alert.alert('Have a code?', 'Open the App Store app, tap your profile picture, then “Redeem Gift Card or Code”.');
+    }
+  };
 
   const onBuy = async () => {
     if (!plan || busy) return;
@@ -169,6 +183,8 @@ export default function Paywall() {
           <Text onPress={() => router.push({ pathname: '/legal', params: { doc: 'terms' } })}>Terms</Text>
           {'  ·  '}
           <Text onPress={() => router.push({ pathname: '/legal', params: { doc: 'privacy' } })}>Privacy</Text>
+          {'  ·  '}
+          <Text onPress={onRedeem}>Have a code?</Text>
           {!storeReady ? '  ·  Test mode' : ''}
         </Text>
       </View>

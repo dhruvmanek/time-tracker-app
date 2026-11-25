@@ -61,6 +61,24 @@ export async function initPurchases() {
   }
 }
 
+/** Save where the user heard about Tikko on their RevenueCat profile, to compare revenue by source. */
+export function setAcquisitionSource(source: string) {
+  if (!storeReady || !started) return;
+  Purchases.setMediaSource(source);
+}
+
+/** Apple's sheet for redeeming an offer code. Returns false if it can't be shown. */
+export async function redeemOfferCode(): Promise<boolean> {
+  if (!storeReady) return false;
+  try {
+    await Purchases.presentCodeRedemptionSheet();
+    return true;
+  } catch (e) {
+    console.warn('Could not open the offer code sheet', e);
+    return false;
+  }
+}
+
 function trialDaysOf(pkg: PurchasesPackage): number {
   const intro = pkg.product.introPrice;
   if (!intro || intro.price !== 0) return 0;

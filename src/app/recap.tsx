@@ -13,6 +13,7 @@ import { C, F, R, S, sticker } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import { getCategory } from '@/lib/categories';
 import { buildRecap, recapDate } from '@/lib/recap';
+import { maybeAskAfterGoodDay } from '@/lib/review';
 import { rateDay, useAppState } from '@/lib/store';
 import { formatHour, formatRange } from '@/lib/time';
 
@@ -142,6 +143,8 @@ export default function RecapScreen() {
                     if (Platform.OS !== 'web') Haptics.selectionAsync();
                     rateDay(date, i + 1);
                     track('day_rated', { rating: i + 1 });
+                    // Only the first rating of the day can trigger the App Store prompt.
+                    if (!rating) setTimeout(() => maybeAskAfterGoodDay(i + 1), 900);
                   }}
                   style={[styles.feeling, on && styles.feelingOn]}
                   accessibilityLabel={`Rate ${i + 1} of 5`}>

@@ -54,6 +54,7 @@ export type Event =
   | 'purchase_cancelled'
   | 'purchase_failed'
   | 'restore_tapped'
+  | 'offer_code_tapped'
   | 'checkin_logged'
   | 'checkin_detail_added'
   | 'mascot_tapped'

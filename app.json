@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tikko",
     "slug": "tikk",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tikk",
@@ -39,7 +39,8 @@
           "imageWidth": 180
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-updates"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -57,6 +58,12 @@
       "revenuecatIosKey": "appl_aKvOcIqhIKHnDEFoVdpfbxBytNv",
       "posthogKey": "phc_pJjRRxVZLRPCEwFQRDEBjVwowMtauyWLBH7RHdq8U8DK",
       "posthogHost": "https://us.i.posthog.com"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e9c85347-3380-40e4-900d-7ced7e1aa923"
     }
   }
 }
