@@ -76,7 +76,7 @@ TIKKO PREMIUM
 Tikko requires a subscription. Choose yearly ($39.99, includes a 3-day free trial for new subscribers) or monthly ($4.99). Payment is charged to your Apple ID when you confirm the purchase, or when the free trial ends. Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in your Apple ID settings. Prices may vary by country.
 
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
-Privacy Policy: https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md
+Privacy Policy: https://gettikko.com/privacy
 ```
 
 **What's New** (first version)
@@ -85,7 +85,7 @@ Welcome to Tikko! Hourly check-ins, one-tap logging, your day hour by hour, insi
 ```
 
 **URLs**
-- Privacy Policy URL: `https://github.com/dhruvmanek/time-tracker-app/blob/main/PRIVACY.md`
+- Privacy Policy URL: `https://gettikko.com/privacy`
 - Support URL: your Google Sites support page (it shows tikko.app.help@gmail.com)
 
 **Category**
