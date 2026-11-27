@@ -86,7 +86,7 @@ Welcome to Tikko! Hourly check-ins, one-tap logging, your day hour by hour, insi
 
 **URLs**
 - Privacy Policy URL: `https://gettikko.com/privacy`
-- Support URL: your Google Sites support page (it shows tikko.app.help@gmail.com)
+- Support URL: `https://gettikko.com/support`
 
 **Category**
 - Primary: **Productivity**
