@@ -10,6 +10,8 @@ onboarding, the paywall, pricing, notifications, or the App Store listing, becau
 the numbers.
 
 ## Unreleased
+
+## OTA (2026-11-27)
 - "Rate Tikko" in Settings now opens the App Store review page.
 - App Store listing links (privacy policy and support) now point to gettikko.com.
 
@@ -17,7 +19,7 @@ the numbers.
 - **Onboarding:** new "Where did you hear about Tikko?" step (attribution).
 - **Ratings:** the rating prompt can now appear after a 4–5 day rating on the evening recap.
 - **Paywall:** offer code redemption.
-- Day view uses three-colour bars (focus / neutral / drain).
+- Insights and the Day page use three-colour bars (focus / other / distracted) instead of one colour per activity.
 - Over-the-air updates enabled.
 - **Listing:** new App Store screenshots; keywords updated.
 
